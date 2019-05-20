@@ -204,6 +204,10 @@ class Scratch3Pasorich {
             pasoriDevice.close();
             pasoriDevice = null;
         }
+
+//		console.log(navigator);
+//		console.log(navigator.usb);
+ 
         navigator.usb.requestDevice({ filters: [{ vendorId: 0x054c }] })
         .then(selectedDevice => {
             pasoriDevice = selectedDevice;
