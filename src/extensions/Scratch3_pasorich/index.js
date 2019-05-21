@@ -38,7 +38,8 @@ function send(s_device, data) {
         let uint8a = new Uint8Array(data);
         console.log("snd -> ");
         s_device.transferOut(2, uint8a)
-        .then(resolve());
+        .then(ret)
+        .catch(err);
 }
 
 
