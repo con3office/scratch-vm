@@ -36,14 +36,14 @@ function sleep(msec) {
 
 function send(s_device, data) {
         let uint8a = new Uint8Array(data);
-//        console.log("snd -> ");
+        console.log("snd -> ");
         s_device.transferOut(2, uint8a)
-        .then(true);
+        .then(resolve());
 }
 
 
 function receive(r_device, len, cpy) {
-//    console.log("rcv <- " + len);
+    console.log("rcv <- " + len);
     r_device.transferIn(1, len)
     .then(result => {
             let arr = [];
@@ -61,7 +61,7 @@ function receive(r_device, len, cpy) {
 
 
 function session(ss_device) {
-//    console.log("=== S:session ===");
+    console.log("=== S:session ===");
 //    console.log("ss_device:");
 //    console.log(ss_device);
 
@@ -168,7 +168,7 @@ function session(ss_device) {
                     }
                     idmStr += idm[i].toString(16);
                 }
-//                console.log(idmStr);
+                console.log("Idm: " + idmStr);
                 idnum = JSON.parse(JSON.stringify(idmStr));
             }
         
@@ -181,7 +181,7 @@ function session(ss_device) {
     ;
 
 
-//    console.log("=== E:session ===");
+    console.log("=== E:session ===");
 
 }
 
@@ -199,13 +199,13 @@ class Scratch3Pasorich {
          */
         this.runtime = runtime;
 
-//        console.log("initializing...");
+        console.log("initializing...");
         if (pasoriDevice != null) {
             pasoriDevice.close();
             pasoriDevice = null;
         }
 
-//		console.log(navigator);
+		console.log(navigator);
 //		console.log(navigator.usb);
  
         navigator.usb.requestDevice({ filters: [{ vendorId: 0x054c }] })
@@ -219,7 +219,8 @@ class Scratch3Pasorich {
         .then(() => 
             pasoriDevice.claimInterface(0)
         );
-//        console.log("init_done");
+        
+        console.log("init_done");
     }
 
 
@@ -271,7 +272,7 @@ class Scratch3Pasorich {
 
 
     readPasori () {
-//        console.log('=== S:readPaSoRi ===');
+        console.log('=== S:readPaSoRi ===');
 
         if(readingFlag){return;}
         readingFlag = true;
@@ -296,12 +297,13 @@ class Scratch3Pasorich {
         })
         .catch(error => { console.log(error); });
 
-//        console.log('=== E:readPaSoRi ===');
+        console.log('=== E:readPaSoRi ===');
     }
 
 
 
     getIdm () {
+		console.log('=== S:getIdm ===');
         return idnum;
     }
 
@@ -311,7 +313,7 @@ class Scratch3Pasorich {
 
 
     openPasori () {
-//        console.log('=== S:openPaSoRi ===');
+        console.log('=== S:openPaSoRi ===');
         
         if(readingFlag){return;}
 
@@ -320,6 +322,21 @@ class Scratch3Pasorich {
             pasoriDevice = null;
         }
 
+
+        navigator.usb.requestDevice({ filters: [{ vendorId: 0x054c }] })
+        .then(selectedDevice => {
+            pasoriDevice = selectedDevice;
+            return pasoriDevice.open();
+        })
+        .then(() => 
+            pasoriDevice.selectConfiguration(1)
+        )
+        .then(() => 
+            pasoriDevice.claimInterface(0)
+        )
+        .catch(error => { console.log(error); });
+
+/**
         navigator.usb.getDevices().then(devices => {
             console.log(devices);
             devices.map(selectedDevice => {
@@ -334,8 +351,9 @@ class Scratch3Pasorich {
             });
         })
         .catch(error => { console.log(error); });
+*/
 
-//        console.log('=== E:openPaSoRi ===');
+        console.log('=== E:openPaSoRi ===');
     }
 
 
