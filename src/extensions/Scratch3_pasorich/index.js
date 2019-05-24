@@ -62,7 +62,7 @@ function receive(r_device, len, cpy) {
 
 
 function session(ss_device) {
-//    console.log("=== S:session ===");
+    console.log("=== S:session ===");
 //    console.log("ss_device:");
 //    console.log(ss_device);
 
@@ -195,7 +195,7 @@ function session(ss_device) {
     ;
 
 
-//    console.log("=== E:session ===");
+    console.log("=== E:session ===");
 
 }
 
@@ -213,7 +213,7 @@ class Scratch3Pasorich {
          */
         this.runtime = runtime;
 
-//        console.log("initializing...");
+        console.log("initializing...");
         if (pasoriDevice != null) {
             pasoriDevice.close();
             pasoriDevice = null;
@@ -238,7 +238,7 @@ class Scratch3Pasorich {
 		)
         ;
         
-//        console.log("init_done");
+        console.log("init_done");
     }
 
 
@@ -262,12 +262,6 @@ class Scratch3Pasorich {
                     opcode: 'getIdm',
                     text: 'Idm',
                     blockType: BlockType.REPORTER
-                },
-                {
-                    opcode: 'resetIdm',
-                    text: 'reset Idm',
-                    blockType: BlockType.COMMAND,
-                    text: 'reset Idm'
                 },
                 {
                     opcode: 'getReadingFlag',
@@ -305,7 +299,7 @@ class Scratch3Pasorich {
 
 
     readPasori () {
-//        console.log('=== S:readPaSoRi ===');
+        console.log('=== S:readPaSoRi ===');
 
         if(readingFlag){return;}
         readingFlag = true;
@@ -336,20 +330,16 @@ class Scratch3Pasorich {
         })
         .catch(error => { console.log(error); });
 
-//        console.log('=== E:readPaSoRi ===');
+        console.log('=== E:readPaSoRi ===');
     }
 
 
 
     getIdm () {
-//		console.log('=== S:getIdm ===');
+		console.log('=== S:getIdm ===');
         return idnum;
     }
 
-	resetIdm () {
-		idnum = '';
-        return;
-    }
 
     getReadingFlag () {
         return readingFlag;
@@ -361,7 +351,7 @@ class Scratch3Pasorich {
     
     
     openPasori () {
-//        console.log('=== S:openPaSoRi ===');
+        console.log('=== S:openPaSoRi ===');
         
         if(readingFlag){return;}
 
@@ -401,7 +391,7 @@ class Scratch3Pasorich {
         .catch(error => { console.log(error); });
 */
 
-//        console.log('=== E:openPaSoRi ===');
+        console.log('=== E:openPaSoRi ===');
     }
 
 
