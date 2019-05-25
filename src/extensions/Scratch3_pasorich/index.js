@@ -225,16 +225,16 @@ class Scratch3Pasorich {
         navigator.usb.requestDevice({ filters: [{ vendorId: 0x054c }] })
         .then(selectedDevice => {
             pasoriDevice = selectedDevice;
-            return pasoriDevice.open();
+            return selectedDevice.open();
         })
         .then(() => 
-            pasoriDevice.selectConfiguration(1)
+            selectedDevice.selectConfiguration(1)
         )
         .then(() => 
-            pasoriDevice.claimInterface(0)
+            selectedDevice.claimInterface(0)
         )
 		.then(() =>
-			session(pasoriDevice)
+			session(selectedDevice)
 		)
         ;
         
@@ -320,19 +320,19 @@ class Scratch3Pasorich {
 //            console.log(devices);
             devices.map(selectedDevice => {
                 pasoriDevice = selectedDevice;
-                pasoriDevice.open()
+                selectedDevice.open()
                 .then(() => 
-                    pasoriDevice.selectConfiguration(1)
+                    selectedDevice.selectConfiguration(1)
                 )
                 .then(() => 
-                    pasoriDevice.claimInterface(0)
+                    selectedDevice.claimInterface(0)
                 )
                 .then(() =>
-					session(pasoriDevice)
+					session(selectedDevice)
                 )
                 ;
             });
-//            session(pasoriDevice);
+
         })
         .catch(error => { console.log(error); });
 
@@ -374,13 +374,13 @@ class Scratch3Pasorich {
         navigator.usb.requestDevice({ filters: [{ vendorId: 0x054c }] })
         .then(selectedDevice => {
             pasoriDevice = selectedDevice;
-            return pasoriDevice.open();
+            return selectedDevice.open();
         })
         .then(() => 
-            pasoriDevice.selectConfiguration(1)
+            selectedDevice.selectConfiguration(1)
         )
         .then(() => 
-            pasoriDevice.claimInterface(0)
+            selectedDevice.claimInterface(0)
         )
         .catch(error => { console.log(error); });
 
