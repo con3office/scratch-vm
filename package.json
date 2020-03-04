@@ -45,8 +45,12 @@
     "nets": "3.2.0",
     "scratch-parser": "5.0.0",
     "scratch-sb1-converter": "0.2.7",
+<<<<<<< HEAD
     "scratch-translate-extension-languages": "0.0.20181205140428",
     "socket.io-client": "^2.2.0",
+=======
+    "scratch-translate-extension-languages": "0.0.20191118205314",
+>>>>>>> 01cb244e3dc5296183ad67a6ee7cd80c4ca1b355
     "text-encoding": "0.7.0",
     "worker-loader": "^1.1.1"
   },
@@ -56,7 +60,12 @@
     "adm-zip": "0.4.11",
     "babel-eslint": "^10.0.1",
     "babel-loader": "^8.0.4",
+<<<<<<< HEAD
     "copy-webpack-plugin": "^5.1.1",
+=======
+    "callsite": "^1.0.0",
+    "copy-webpack-plugin": "^4.5.4",
+>>>>>>> 01cb244e3dc5296183ad67a6ee7cd80c4ca1b355
     "docdash": "^1.0.0",
     "eslint": "^5.16.0",
     "eslint-config-scratch": "^5.0.0",
@@ -67,7 +76,11 @@
     "in-publish": "^2.0.0",
     "jsdoc": "^3.6.3",
     "json": "^9.0.4",
+<<<<<<< HEAD
     "lodash.defaultsdeep": "^4.6.1",
+=======
+    "lodash.defaultsdeep": "4.6.1",
+>>>>>>> 01cb244e3dc5296183ad67a6ee7cd80c4ca1b355
     "pngjs": "^3.3.2",
     "scratch-audio": "latest",
     "scratch-blocks": "latest",
