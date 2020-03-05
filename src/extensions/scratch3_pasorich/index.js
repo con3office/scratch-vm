@@ -205,7 +205,7 @@ function session(ss_device) {
  * @param {Runtime} runtime - the runtime instantiating this block package.
  * @constructor
  */
-class scratch3Pasorich {
+class Scratch3Pasorich {
     constructor (runtime) {
         /**
          * The runtime instantiating this block package.
@@ -220,7 +220,7 @@ class scratch3Pasorich {
         }
 
 		console.log(navigator);
-//		console.log(navigator.usb);
+		console.log(navigator.usb);
  
         navigator.usb.requestDevice({ filters: [{ vendorId: 0x054c }] })
         .then(selectedDevice => {
@@ -412,4 +412,4 @@ class scratch3Pasorich {
 
 
 }
-module.exports = scratch3Pasorich;
+module.exports = Scratch3Pasorich;

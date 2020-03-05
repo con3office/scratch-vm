@@ -51,8 +51,8 @@
     "worker-loader": "^1.1.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.8.6",
-    "@babel/preset-env": "^7.8.6",
+    "@babel/core": "^7.8.7",
+    "@babel/preset-env": "^7.8.7",
     "adm-zip": "0.4.11",
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.0.6",
