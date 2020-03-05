@@ -205,7 +205,7 @@ function session(ss_device) {
  * @param {Runtime} runtime - the runtime instantiating this block package.
  * @constructor
  */
-class Scratch3Pasorich {
+class scratch3Pasorich {
     constructor (runtime) {
         /**
          * The runtime instantiating this block package.
@@ -412,4 +412,4 @@ class Scratch3Pasorich {
 
 
 }
-module.exports = Scratch3Pasorich;
+module.exports = scratch3Pasorich;
