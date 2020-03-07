@@ -205,7 +205,7 @@ function session(ss_device) {
  * @param {Runtime} runtime - the runtime instantiating this block package.
  * @constructor
  */
-class Scratch3Pasorich {
+class Scratch3Sc2Scratch {
     constructor (runtime) {
         /**
          * The runtime instantiating this block package.
@@ -214,6 +214,10 @@ class Scratch3Pasorich {
         this.runtime = runtime;
 
 //        console.log("initializing...");
+
+/*
+ //SC2Scratch
+
         if (pasoriDevice != null) {
             pasoriDevice.close();
             pasoriDevice = null;
@@ -237,7 +241,8 @@ class Scratch3Pasorich {
 			session(pasoriDevice)
 		)
         ;
-        
+
+*/
 //        console.log("init_done");
     }
 
@@ -247,8 +252,8 @@ class Scratch3Pasorich {
      */
     getInfo () {
         return {
-            id: 'pasorich',
-            name: 'PaSoRich',
+            id: 'sc2scratch',
+            name: 'SC2Scrach',
             menuIconURI: menuIconURI,
             blockIconURI: blockIconURI,
             blocks: [
@@ -412,4 +417,4 @@ class Scratch3Pasorich {
 
 
 }
-module.exports = Scratch3Pasorich;
+module.exports = Scratch3Sc2Scratch;
