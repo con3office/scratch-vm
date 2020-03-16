@@ -240,7 +240,7 @@ class Scratch3Pasorich {
 			session(pasoriDevice)
 		)
         ;
-        console.log("PaSoRich 0.3.6(25)");
+        console.log("PaSoRich 0.3.6(0316)");
 //        console.log("init_done");
     }
 
