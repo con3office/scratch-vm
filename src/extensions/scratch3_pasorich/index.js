@@ -58,7 +58,8 @@ function receive(r_device, len, cpy) {
 //                console.log("gr_arr:" + gr_arr);
             }
             return arr;
-    });
+    })
+    .catch(error => { console.log(error); });
 }
 
 
@@ -239,7 +240,7 @@ class Scratch3Pasorich {
 		.then(() =>
 			session(pasoriDevice)
 		)
-        ;
+        .catch(error => { console.log(error); });
         console.log("PaSoRich 0.3.6(0316)");
 //        console.log("init_done");
     }
@@ -333,7 +334,7 @@ class Scratch3Pasorich {
                 .then(() =>
 					session(pasoriDevice)
                 )
-                ;
+                .catch(error => { console.log(error); });
             });
 //            session(pasoriDevice);
         })
