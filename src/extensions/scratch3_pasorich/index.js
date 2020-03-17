@@ -10,6 +10,7 @@ var gr_arr;
 var readingFlag = false;
 const intvalTime_long = 15;
 const intvalTime_short = 9;
+const PaSoRichVersion = 'PaSoRich 0.3.6(0317d)';
 
 
  /**
@@ -257,7 +258,7 @@ class Scratch3Pasorich {
             })
             .catch(error => { console.log(error); });
 
-            console.log("PaSoRich 0.3.6(0317test)");
+            console.log(PaSoRichVersion);
 //           console.log("init_done");
         }
     }
