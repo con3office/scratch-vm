@@ -9,7 +9,7 @@ var idnum;
 var gr_arr;
 var readingFlag = false;
 const intvalTime_long = 15;
-const intvalTime_short = 9;
+const intvalTime_short = 10;
 const PaSoRichVersion = 'PaSoRich 0.3.6(0317d)';
 
 
@@ -78,7 +78,7 @@ function session(ss_device) {
 //    console.log(ss_device);
 
 
-    sleep(32).then(() => {
+    sleep(28).then(() => {
         send(ss_device, [0x00, 0x00, 0xff, 0x00, 0xff, 0x00], false);
         return sleep(intvalTime_long);
     })
