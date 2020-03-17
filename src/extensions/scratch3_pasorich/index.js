@@ -57,19 +57,18 @@ function receive(r_device, len, cpy) {
     if(receiveTrans !== undefined){
         receiveTrans.then(result => {
             let arr = [];
-                for (let i = result.data.byteOffset; i < result.data.byteLength; i++) {
-                    arr.push(result.data.getUint8(i));
-                }
-                if(cpy){
-                    gr_arr = JSON.parse(JSON.stringify(arr));
-//                    console.log("gr_arr:" + gr_arr);
-                }
-                return arr;
+            for (let i = result.data.byteOffset; i < result.data.byteLength; i++) {
+                arr.push(result.data.getUint8(i));
+            }
+            if(cpy){
+                gr_arr = JSON.parse(JSON.stringify(arr));
+//                console.log("gr_arr:" + gr_arr);
+            }
+            return arr;
         })
         .catch(error => { console.log(error); });
     }
 }
-
 
 
 function session(ss_device) {
@@ -78,7 +77,7 @@ function session(ss_device) {
 //    console.log(ss_device);
 
 
-    sleep(38).then(() => {
+    sleep(32).then(() => {
         send(ss_device, [0x00, 0x00, 0xff, 0x00, 0xff, 0x00], false);
         return sleep(intvalTime_long);
     })
@@ -203,8 +202,7 @@ function session(ss_device) {
 		setTimeout(() => {
             readingFlag = false;
         },8);		
-	})
-    ;
+	});
 
 
 //    console.log("=== E:session ===");
@@ -256,11 +254,10 @@ class Scratch3Pasorich {
             })
 		    .then(() => {
 		    	session(pasoriDevice);
-//                sleep(intvalTime_short);
             })
             .catch(error => { console.log(error); });
 
-            console.log("PaSoRich 0.3.6(0317b)");
+            console.log("PaSoRich 0.3.6(0317c)");
 //           console.log("init_done");
         }
     }
@@ -341,7 +338,7 @@ class Scratch3Pasorich {
         }
 
         var devicePromise = navigator.usb.getDevices();
-
+        
         while(devicePromise == undefined){
             sleep(intvalTime_short);
         }
@@ -363,7 +360,6 @@ class Scratch3Pasorich {
 				        	session(pasoriDevice);
                         })
                         .catch(error => { console.log(error); });
-                    
 
                 });
 //                session(pasoriDevice);
@@ -416,12 +412,11 @@ class Scratch3Pasorich {
                 return pasoriDevice.open();
             })
             .then(() => {
-                pasoriDevice.selectConfiguration(1)
+                pasoriDevice.selectConfiguration(1);
                 sleep(intvalTime_short);
             })
             .then(() => {
                 pasoriDevice.claimInterface(0);
-                sleep(intvalTime_short);
             })
             .catch(error => { console.log(error); });
         }
@@ -455,4 +450,5 @@ class Scratch3Pasorich {
 
 
 }
+
 module.exports = Scratch3Pasorich;
