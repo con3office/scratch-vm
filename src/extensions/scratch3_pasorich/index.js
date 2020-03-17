@@ -10,7 +10,7 @@ var gr_arr;
 var readingFlag = false;
 const intvalTime_long = 15;
 const intvalTime_short = 10;
-const PaSoRichVersion = 'PaSoRich 0.3.6(0317d)';
+const PaSoRichVersion = "PaSoRich 0.3.6(0317e)";
 
 
  /**
