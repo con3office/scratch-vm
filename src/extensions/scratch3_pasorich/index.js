@@ -257,7 +257,7 @@ class Scratch3Pasorich {
             })
             .catch(error => { console.log(error); });
 
-            console.log("PaSoRich 0.3.6(0317c)");
+            console.log("PaSoRich 0.3.6(0317test)");
 //           console.log("init_done");
         }
     }
