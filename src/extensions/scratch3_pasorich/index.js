@@ -10,7 +10,7 @@ var gr_arr;
 var readingFlag = false;
 const intvalTime_long = 15;
 const intvalTime_short = 10;
-const PaSoRichVersion = "PaSoRich 0.3.6(0317e)";
+const PaSoRichVersion = "PaSoRich 0.3.7";
 
 
  /**
@@ -246,15 +246,16 @@ class Scratch3Pasorich {
                 return pasoriDevice.open();
             })
             .then(() => {
-                pasoriDevice.selectConfiguration(1);
                 sleep(intvalTime_short);
+                return pasoriDevice.selectConfiguration(1);
             })
             .then(() => {
-                pasoriDevice.claimInterface(0);
                 sleep(intvalTime_short);
+                return pasoriDevice.claimInterface(0);
             })
 		    .then(() => {
-		    	session(pasoriDevice);
+                sleep(intvalTime_short);
+		    	return session(pasoriDevice);
             })
             .catch(error => { console.log(error); });
 
@@ -350,17 +351,18 @@ class Scratch3Pasorich {
                 devices.map(selectedDevice => {
                     pasoriDevice = selectedDevice;
                     pasoriDevice.open().then(() => {
-                            pasoriDevice.selectConfiguration(1);
-                            sleep(intvalTime_short);
-                        })
-                        .then(() => {
-                            pasoriDevice.claimInterface(0);
-                            sleep(intvalTime_short);
-                        })
-                        .then(() => {
-				        	session(pasoriDevice);
-                        })
-                        .catch(error => { console.log(error); });
+                        sleep(intvalTime_short);
+                        return pasoriDevice.selectConfiguration(1);
+                    })
+                    .then(() => {
+                        sleep(intvalTime_short);
+                        return pasoriDevice.claimInterface(0);
+                    })
+                    .then(() => {
+                        sleep(intvalTime_short);
+			        	return session(pasoriDevice);
+                    })
+                    .catch(error => { console.log(error); });
 
                 });
 //                session(pasoriDevice);
@@ -413,11 +415,12 @@ class Scratch3Pasorich {
                 return pasoriDevice.open();
             })
             .then(() => {
-                pasoriDevice.selectConfiguration(1);
                 sleep(intvalTime_short);
+                return pasoriDevice.selectConfiguration(1);
             })
             .then(() => {
-                pasoriDevice.claimInterface(0);
+                sleep(intvalTime_short);
+                return pasoriDevice.claimInterface(0);
             })
             .catch(error => { console.log(error); });
         }
