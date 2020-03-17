@@ -9,7 +9,7 @@ var idnum;
 var gr_arr;
 var readingFlag = false;
 const intvalTime_long = 15;
-const intvalTime_short = 8;
+const intvalTime_short = 9;
 
 
  /**
@@ -47,18 +47,27 @@ function send(s_device, data) {
 
 function receive(r_device, len, cpy) {
 //    console.log("rcv <- " + len);
-    r_device.transferIn(1, len)
-    .then(result => {
+
+    var receiveTrans = r_device.transferIn(1, len);
+
+    while(receiveTrans == undefined){
+        sleep(intvalTime_short);
+    }
+
+    if(receiveTrans !== undefined){
+        receiveTrans.then(result => {
             let arr = [];
-            for (let i = result.data.byteOffset; i < result.data.byteLength; i++) {
-                arr.push(result.data.getUint8(i));
-            }
-            if(cpy){
-                gr_arr = JSON.parse(JSON.stringify(arr));
-//                console.log("gr_arr:" + gr_arr);
-            }
-            return arr;
-    });
+                for (let i = result.data.byteOffset; i < result.data.byteLength; i++) {
+                    arr.push(result.data.getUint8(i));
+                }
+                if(cpy){
+                    gr_arr = JSON.parse(JSON.stringify(arr));
+//                    console.log("gr_arr:" + gr_arr);
+                }
+                return arr;
+        })
+        .catch(error => { console.log(error); });
+    }
 }
 
 
@@ -222,26 +231,38 @@ class Scratch3Pasorich {
             pasoriDevice = null;
         }
 
-		console.log(navigator);
-		console.log(navigator.usb);
+//		console.log(navigator);
+//		console.log(navigator.usb);
  
-        navigator.usb.requestDevice({ filters: [{ vendorId: 0x054c }] })
-        .then(selectedDevice => {
-            pasoriDevice = selectedDevice;
-            return pasoriDevice.open();
-        })
-        .then(() => 
-            pasoriDevice.selectConfiguration(1)
-        )
-        .then(() => 
-            pasoriDevice.claimInterface(0)
-        )
-		.then(() =>
-			session(pasoriDevice)
-		)
-        ;
-        console.log("PaSoRich 0.3.6(0316)");
-//        console.log("init_done");
+        var reqdevicePromise = navigator.usb.requestDevice({ filters: [{ vendorId: 0x054c }] });
+
+        while(reqdevicePromise == undefined){
+            sleep(intvalTime_short);
+        }
+    
+        if (reqdevicePromise !== undefined) {
+
+            reqdevicePromise.then(selectedDevice => {
+                pasoriDevice = selectedDevice;
+                return pasoriDevice.open();
+            })
+            .then(() => {
+                pasoriDevice.selectConfiguration(1);
+                sleep(intvalTime_short);
+            })
+            .then(() => {
+                pasoriDevice.claimInterface(0);
+                sleep(intvalTime_short);
+            })
+		    .then(() => {
+		    	session(pasoriDevice);
+//                sleep(intvalTime_short);
+            })
+            .catch(error => { console.log(error); });
+
+            console.log("PaSoRich 0.3.6(0317b)");
+//           console.log("init_done");
+        }
     }
 
 
@@ -319,26 +340,36 @@ class Scratch3Pasorich {
             pasoriDevice.close();
         }
 
-        navigator.usb.getDevices().then(devices => {
-//            console.log(devices);
-            devices.map(selectedDevice => {
-                pasoriDevice = selectedDevice;
-                pasoriDevice.open()
-                .then(() => 
-                    pasoriDevice.selectConfiguration(1)
-                )
-                .then(() => 
-                    pasoriDevice.claimInterface(0)
-                )
-                .then(() =>
-					session(pasoriDevice)
-                )
-                ;
-            });
-//            session(pasoriDevice);
-        })
-        .catch(error => { console.log(error); });
+        var devicePromise = navigator.usb.getDevices();
 
+        while(devicePromise == undefined){
+            sleep(intvalTime_short);
+        }
+
+        if (devicePromise !== undefined) {
+            devicePromise.then(devices => {
+//            console.log(devices);
+                devices.map(selectedDevice => {
+                    pasoriDevice = selectedDevice;
+                    pasoriDevice.open().then(() => {
+                            pasoriDevice.selectConfiguration(1);
+                            sleep(intvalTime_short);
+                        })
+                        .then(() => {
+                            pasoriDevice.claimInterface(0);
+                            sleep(intvalTime_short);
+                        })
+                        .then(() => {
+				        	session(pasoriDevice);
+                        })
+                        .catch(error => { console.log(error); });
+                    
+
+                });
+//                session(pasoriDevice);
+            })
+            .catch(error => { console.log(error); });
+        }
 //        console.log('=== E:readPaSoRi ===');
     }
 
@@ -373,19 +404,27 @@ class Scratch3Pasorich {
             pasoriDevice = null;
         }
 
+        var reqdevicePromise = navigator.usb.requestDevice({ filters: [{ vendorId: 0x054c }] });
 
-        navigator.usb.requestDevice({ filters: [{ vendorId: 0x054c }] })
-        .then(selectedDevice => {
-            pasoriDevice = selectedDevice;
-            return pasoriDevice.open();
-        })
-        .then(() => 
-            pasoriDevice.selectConfiguration(1)
-        )
-        .then(() => 
-            pasoriDevice.claimInterface(0)
-        )
-        .catch(error => { console.log(error); });
+        while(reqdevicePromise == undefined){
+            sleep(intvalTime_short);
+        }
+
+        if (reqdevicePromise !== undefined) {
+           reqdevicePromise.then(selectedDevice => {
+                pasoriDevice = selectedDevice;
+                return pasoriDevice.open();
+            })
+            .then(() => {
+                pasoriDevice.selectConfiguration(1)
+                sleep(intvalTime_short);
+            })
+            .then(() => {
+                pasoriDevice.claimInterface(0);
+                sleep(intvalTime_short);
+            })
+            .catch(error => { console.log(error); });
+        }
 
 /**
         navigator.usb.getDevices().then(devices => {
@@ -405,6 +444,7 @@ class Scratch3Pasorich {
 */
 
 //        console.log('=== E:openPaSoRi ===');
+
     }
 
 
