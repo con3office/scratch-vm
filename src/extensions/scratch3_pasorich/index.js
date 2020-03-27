@@ -6,11 +6,13 @@ const log = require('../../util/log');
 //PaSoRich Values
 var pasoriDevice;
 var idnum;
+var isConnect = "Push to Connect.";
 var gr_arr;
 var readingFlag = false;
+var connectingCount = 0;
 const intvalTime_long = 15;
 const intvalTime_short = 9;
-const PaSoRichVersion = "PaSoRich 0.3.8";
+const PaSoRichVersion = "PaSoRich 0.4.3";
 
 
  /**
@@ -311,6 +313,12 @@ class Scratch3Pasorich {
             blockIconURI: blockIconURI,
             blocks: [
                 {
+                    opcode: 'openPasori',
+                    text: 'Connect',
+                    blockType: BlockType.REPORTER
+                },
+                '---',
+                {
                     opcode: 'readPasori',
                     text: 'read PaSoRi',
                     blockType: BlockType.COMMAND,
@@ -376,7 +384,7 @@ class Scratch3Pasorich {
                 session(pasoriDevice);
             }
             else{
-    
+   
                 var devicePromise = navigator.usb.getDevices();
             
                 while(devicePromise == undefined){
@@ -452,7 +460,8 @@ class Scratch3Pasorich {
     }
 
 	resetIdm () {
-		idnum = '';
+        idnum = '';
+        readingFlag = false;
         return;
     }
 
@@ -469,51 +478,103 @@ class Scratch3Pasorich {
     openPasori () {
 //        console.log('=== S:openPaSoRi ===');
         
-        if(readingFlag){return;}
-
-        if (pasoriDevice != null) {
-            pasoriDevice.close();
-            pasoriDevice = null;
+        if(readingFlag){
+            isConnect = "Reading...";
+            return isConnect;
+        }
+        
+        if (pasoriDevice !== undefined && pasoriDevice !== null) {
+            connectingCount = 0;
+            isConnect = "Connected...";
+            return isConnect;
+//            pasoriDevice.close();
+//            pasoriDevice = null;
         }
 
-        var reqdevicePromise = navigator.usb.requestDevice({ filters: [{ vendorId: 0x054c }] });
-
-        while(reqdevicePromise == undefined){
-            sleep(intvalTime_short);
+        if(connectingCount >= 1){
+            isConnect = "Connecting...";
+            return isConnect;
         }
+        else {
 
-        if (reqdevicePromise !== undefined) {
-           reqdevicePromise.then(selectedDevice => {
-                pasoriDevice = selectedDevice;
-                return pasoriDevice.open();
-            })
-            .then(() => {
+            connectingCount += 1;
+
+            isConnect = "Connecting...";
+
+            if (connectingCount > 1){
+                return isConnect;
+            }
+
+/*    
+            var devicePromise = navigator.usb.getDevices();
+                
+            while(devicePromise == undefined){
                 sleep(intvalTime_short);
-                return pasoriDevice.selectConfiguration(1);
-            })
-            .then(() => {
-                sleep(intvalTime_short);
-                return pasoriDevice.claimInterface(0);
-            })
-            .catch(error => { console.log(error); });
-        }
-
-/**
-        navigator.usb.getDevices().then(devices => {
-            console.log(devices);
-            devices.map(selectedDevice => {
-                pasoriDevice = selectedDevice;
-                pasoriDevice.open()
-                .then(() => 
-                    pasoriDevice.selectConfiguration(1)
-                )
-                .then(() => 
-                    pasoriDevice.claimInterface(0)
-                );
-            });
-        })
-        .catch(error => { console.log(error); });
+            }
+    
+            if (devicePromise !== undefined) {
+    
+                devicePromise.then(devices => {
+    //                console.log(devices);
+                    devices.map(selectedDevice => {
+                        pasoriDevice = selectedDevice;
+                        pasoriDevice.open()
+                        .then(() => 
+                            pasoriDevice.selectConfiguration(1)
+                        )
+                        .then(() => 
+                            pasoriDevice.claimInterface(0)
+                        );
+                    });
+                })
+                .then(() => {
+                    isConnect = "Success...";
+                    return isConnect;
+                })
+                .catch(error => {
+                    console.log(error);
+                    isConnect = "Failure...";
+                    return isConnect;
+                });
+            }
+    
 */
+
+            var reqdevicePromise = navigator.usb.requestDevice({ filters: [{ vendorId: 0x054c }] });
+    
+            while(reqdevicePromise == undefined){
+                sleep(intvalTime_short);
+            }
+    
+            if (reqdevicePromise !== undefined) {
+               reqdevicePromise.then(selectedDevice => {
+                    pasoriDevice = selectedDevice;
+                    return pasoriDevice.open();
+                })
+                .then(() => {
+                    sleep(intvalTime_short);
+                    return pasoriDevice.selectConfiguration(1);
+                })
+                .then(() => {
+                    sleep(intvalTime_short);
+                    return pasoriDevice.claimInterface(0);
+                })
+                .then(() => {
+                    connectingCount = 0;
+                    isConnect = "Success...";
+                    return isConnect;
+                })
+                .catch(error => {
+                     console.log(error);
+                     pasoriDevice = null;
+                     connectingCount = 0;
+                     isConnect = "Failure...";
+                     return isConnect;
+                });
+            }
+        }
+
+        return isConnect;
 
 //        console.log('=== E:openPaSoRi ===');
 
