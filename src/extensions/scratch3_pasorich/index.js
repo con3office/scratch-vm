@@ -51,7 +51,7 @@ function hexString(textStr) {
 }
 
 function sleep(msec) {
-    return new Promise(resolve => 
+    return new Promise(resolve =>
         setTimeout(() => {
             resolve();
         }, msec)
@@ -188,14 +188,14 @@ function session(ss_device) {
         return sleep(intvalTime_short);
     })
     .then(() => {
-	    
+
 //	    console.log(gr_arr);
 
 //        idnum = '';
 
 	    if (gr_arr != undefined){
 	        if (gr_arr.length > 25){
-	            
+
 	            let idm = gr_arr.slice(17, 25);
 //        	    console.log("sliced: " + idm);
                 if (idm.length > 0) {
@@ -208,7 +208,7 @@ function session(ss_device) {
 					}
 //					console.log("Idm: " + idmStr);
                     idnum = JSON.parse(JSON.stringify(idmStr));
-                    
+
 
                     if (!crypto || !crypto.subtle) {
                         throw Error("crypto.subtle is not supported.");
@@ -217,19 +217,19 @@ function session(ss_device) {
                     crypto.subtle.digest('SHA-256', new TextEncoder().encode(idnum))
                     .then(idnumStr => {
                         idnum_sha256 = hexString(idnumStr);
-                        sleep(intvalTime_long);
+                        sleep(20);
 //    					console.log("HashedIdm: " + idnum_sha256);
                     });
 
             	}
-            	
+
         	}else {
                 idnum = '';
                 idnum_sha256 = '';
         	}
-        	
+
 	    } else {
-				idnum = '';		    
+				idnum = '';
                 idnum_sha256 = '';
 	    }
 
@@ -240,7 +240,7 @@ function session(ss_device) {
 	.finally(() => {
 		setTimeout(() => {
             readingFlag = false;
-        },8);		
+        },8);
 	});
 
 
@@ -284,10 +284,10 @@ class Scratch3Pasorich {
                 devices.map(selectedDevice => {
                     pasoriDevice = selectedDevice;
                     pasoriDevice.open()
-                    .then(() => 
+                    .then(() =>
                         pasoriDevice.selectConfiguration(1)
                     )
-                    .then(() => 
+                    .then(() =>
                         pasoriDevice.claimInterface(0)
                     );
                 });
@@ -300,7 +300,7 @@ class Scratch3Pasorich {
         if(pasoriDevice == null){
 
 //            console.log("open_11" + pasoriDevice);
- 
+
             var reqdevicePromise = navigator.usb.requestDevice({ filters: [{ vendorId: 0x054c }] });
 
             while(reqdevicePromise == undefined){
@@ -425,13 +425,13 @@ class Scratch3Pasorich {
                 session(pasoriDevice);
             }
             else{
-   
+
                 var devicePromise = navigator.usb.getDevices();
-            
+
                 while(devicePromise == undefined){
                     sleep(intvalTime_short);
                 }
-        
+
                 if (devicePromise !== undefined) {
                     devicePromise.then(devices => {
         //            console.log(devices);
@@ -450,12 +450,12 @@ class Scratch3Pasorich {
                                 return session(pasoriDevice);
                             })
                             .catch(error => { console.log(error); });
-        
+
                         });
                     })
                     .catch(error => { console.log(error); });
                 }
-        
+
 //select
 
                 var reqdevicePromise = navigator.usb.requestDevice({ filters: [{ vendorId: 0x054c }] });
@@ -463,9 +463,9 @@ class Scratch3Pasorich {
                 while(reqdevicePromise == undefined){
                     sleep(intvalTime_short);
                 }
-    
+
                 if (reqdevicePromise !== undefined) {
-    
+
                     reqdevicePromise.then(selectedDevice => {
                         pasoriDevice = selectedDevice;
                         return pasoriDevice.open();
@@ -514,21 +514,21 @@ class Scratch3Pasorich {
 	getWaitingFlag () {
         return !readingFlag;
     }
-    
+
     getHashedIdm () {
         console.log("HashedIdm: " + idnum_sha256);
         return idnum_sha256;
     }
-        
+
 
     openPasori () {
 //        console.log('=== S:openPaSoRi ===');
-        
+
         if(readingFlag){
             isConnect = "Reading...";
             return isConnect;
         }
-        
+
         if (pasoriDevice !== undefined && pasoriDevice !== null) {
             connectingCount = 0;
             isConnect = "Connected...";
@@ -551,24 +551,24 @@ class Scratch3Pasorich {
                 return isConnect;
             }
 
-/*    
+/*
             var devicePromise = navigator.usb.getDevices();
-                
+
             while(devicePromise == undefined){
                 sleep(intvalTime_short);
             }
-    
+
             if (devicePromise !== undefined) {
-    
+
                 devicePromise.then(devices => {
     //                console.log(devices);
                     devices.map(selectedDevice => {
                         pasoriDevice = selectedDevice;
                         pasoriDevice.open()
-                        .then(() => 
+                        .then(() =>
                             pasoriDevice.selectConfiguration(1)
                         )
-                        .then(() => 
+                        .then(() =>
                             pasoriDevice.claimInterface(0)
                         );
                     });
@@ -583,15 +583,15 @@ class Scratch3Pasorich {
                     return isConnect;
                 });
             }
-    
+
 */
 
             var reqdevicePromise = navigator.usb.requestDevice({ filters: [{ vendorId: 0x054c }] });
-    
+
             while(reqdevicePromise == undefined){
                 sleep(intvalTime_short);
             }
-    
+
             if (reqdevicePromise !== undefined) {
                reqdevicePromise.then(selectedDevice => {
                     pasoriDevice = selectedDevice;
