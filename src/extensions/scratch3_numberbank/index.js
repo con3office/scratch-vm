@@ -80,9 +80,9 @@ class Scratch3Numberbank {
             blockIconURI: blockIconURI,
             blocks: [
                 {
-                    opcode: 'convertSha256',
+                    opcode: 'setHexkey',
                     blockType: BlockType.COMMAND,
-                    text: 'sha256 [TEXT]',
+                    text: 'key [TEXT]',
                     arguments: {
                         TEXT: {
                             type: ArgumentType.STRING,
@@ -93,6 +93,16 @@ class Scratch3Numberbank {
                 {
                     opcode: 'getHashText',
                     text: 'getHashText',
+                    blockType: BlockType.REPORTER
+                },
+                {
+                    opcode: 'getIdm',
+                    text: 'Idm',
+                    blockType: BlockType.REPORTER
+                },
+                {
+                    opcode: 'getHashIdm',
+                    text: 'HashIdm',
                     blockType: BlockType.REPORTER
                 }
 /**
@@ -117,19 +127,8 @@ class Scratch3Numberbank {
         };
     }
 
-    convertSha256 (args) {
-
-        if (!crypto || !crypto.subtle) {
-            throw Error("crypto.subtle is not supported.");
-        }
-
-        crypto.subtle.digest('SHA-256', new TextEncoder().encode(args.TEXT))
-        .then(x => {
-            text_sha256 = hexString(x); // convert to hex string.
-        });
-
-        return text_sha256;
-
+    setHexkey (args) {
+        text_sha256 = args.TEXT;
     }
 
     /**
