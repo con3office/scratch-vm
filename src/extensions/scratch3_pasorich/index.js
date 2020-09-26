@@ -22,7 +22,7 @@ var readingFlag = false;
 var connectingCount = 0;
 const intvalTime_long = 15;
 const intvalTime_short = 9;
-const PaSoRichVersion = "PaSoRich 0.5.0";
+const PaSoRichVersion = "PaSoRich 0.5.1";
 
 
  /**
@@ -190,7 +190,9 @@ function session(ss_device) {
     .then(() => {
 	    
 //	    console.log(gr_arr);
-	    
+
+//        idnum = '';
+
 	    if (gr_arr != undefined){
 	        if (gr_arr.length > 25){
 	            
@@ -204,7 +206,7 @@ function session(ss_device) {
 						}
 						idmStr += idm[i].toString(16);
 					}
-					console.log("Idm: " + idmStr);
+//					console.log("Idm: " + idmStr);
                     idnum = JSON.parse(JSON.stringify(idmStr));
                     
 
@@ -213,8 +215,9 @@ function session(ss_device) {
                     }
 
                     crypto.subtle.digest('SHA-256', new TextEncoder().encode(idnum))
-                    .then(idStr => {
-                        idnum_sha256 = hexString(idStr);
+                    .then(idnumStr => {
+                        idnum_sha256 = hexString(idnumStr);
+//    					console.log("HashedIdm: " + idnum_sha256);
                     });
 
             	}
@@ -362,6 +365,11 @@ class Scratch3Pasorich {
                     blockType: BlockType.REPORTER
                 },
                 {
+                    opcode: 'getHashedIdm',
+                    text: 'HashedIdm',
+                    blockType: BlockType.REPORTER
+                },
+                {
                     opcode: 'resetIdm',
                     text: 'reset Idm',
                     blockType: BlockType.COMMAND,
@@ -376,11 +384,6 @@ class Scratch3Pasorich {
                     opcode: 'getWaitingFlag',
                     text: 'waiting',
                     blockType: BlockType.BOOLEAN
-                },
-                {
-                    opcode: 'getHashIdm',
-                    text: 'HashIdm',
-                    blockType: BlockType.REPORTER
                 }
 /**
                 ,
@@ -411,7 +414,7 @@ class Scratch3Pasorich {
         if(readingFlag){return;}
         readingFlag = true;
 
-		idnum = '';
+//		idnum = '';
 
 //        console.log("read_11" + pasoriDevice);
 
@@ -511,7 +514,8 @@ class Scratch3Pasorich {
         return !readingFlag;
     }
     
-    getHashIdm () {
+    getHashedIdm () {
+        console.log("HashedIdm: " + idnum_sha256);
         return idnum_sha256;
     }
         
