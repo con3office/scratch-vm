@@ -1,3 +1,12 @@
+/*
+    SC2Scratch for PaSoRi (PaSoRich)
+    Scratch3.0 Extension to read SmartCard (Felica) by SONY RC-S380 (PaSoRi)
+
+    Web:
+    https://con3.com/sc2scratch/
+
+*/
+
 const ArgumentType = require('../../extension-support/argument-type');
 const BlockType = require('../../extension-support/block-type');
 const Cast = require('../../util/cast');
@@ -11,8 +20,8 @@ var gr_arr;
 var readingFlag = false;
 var connectingCount = 0;
 const intvalTime_long = 15;
-const intvalTime_short = 9;
-const PaSoRichVersion = "PaSoRich 0.4.3";
+const intvalTime_short = 10;
+const PaSoRichVersion = "PaSoRich 0.4.4";
 
 
  /**
@@ -344,6 +353,11 @@ class Scratch3Pasorich {
                     opcode: 'getWaitingFlag',
                     text: 'waiting',
                     blockType: BlockType.BOOLEAN
+                },
+                {
+                    opcode: 'getHashIdm',
+                    text: 'HashIdm',
+                    blockType: BlockType.REPORTER
                 }
 /**
                 ,
@@ -473,6 +487,12 @@ class Scratch3Pasorich {
         return !readingFlag;
     }
     
+    getHashIdm () {
+
+
+        return idnum;
+    }
+        
     
 
     openPasori () {
