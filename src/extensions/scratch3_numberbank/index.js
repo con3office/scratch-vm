@@ -35,6 +35,17 @@ const menuIconURI = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iN
 
 
 
+function hexString(buffer) {
+    const byteArray = new Uint8Array(buffer);
+    const hexCodes = [...byteArray].map(value => {
+      const hexCode = value.toString(16);
+      const paddedHexCode = hexCode.padStart(2, '0');
+      return paddedHexCode;
+    });
+    return hexCodes.join('');
+}
+
+
 /**
  * Class for the NumberBank with Scratch 3.0
  * @param {Runtime} runtime - the runtime instantiating this block package.
@@ -108,14 +119,17 @@ class Scratch3Numberbank {
 
     convertSha256 (args) {
 
-        const byteArray = new Uint8Array(args.TEXT);
-        const hexCodes = [...byteArray].map(value => {
-          const hexCode = value.toString(16);
-          const paddedHexCode = hexCode.padStart(2, '0');
-          return paddedHexCode;
+        if (!crypto || !crypto.subtle) {
+            throw Error("crypto.subtle is not supported.");
+        }
+
+        crypto.subtle.digest('SHA-256', new TextEncoder().encode(args.TEXT))
+        .then(x => {
+            text_sha256 = hexString(x); // convert to hex string.
         });
-        return text_sha256 = hexCodes.join('');
-        
+
+        return text_sha256;
+
     }
 
     /**
