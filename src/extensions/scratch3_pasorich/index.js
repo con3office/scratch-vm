@@ -22,7 +22,7 @@ var readingFlag = false;
 var connectingCount = 0;
 const intvalTime_long = 15;
 const intvalTime_short = 9;
-const PaSoRichVersion = "PaSoRich 0.5.1";
+const PaSoRichVersion = "PaSoRich 0.5.2";
 
 
  /**
@@ -217,7 +217,7 @@ function session(ss_device) {
                     crypto.subtle.digest('SHA-256', new TextEncoder().encode(idnum))
                     .then(idnumStr => {
                         idnum_sha256 = hexString(idnumStr);
-//    					console.log("HashedIdm: " + idnum_sha256);
+    					console.log("HashedIdm: " + idnum_sha256);
                     });
 
             	}
