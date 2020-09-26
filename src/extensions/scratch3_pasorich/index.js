@@ -515,7 +515,7 @@ class Scratch3Pasorich {
     }
     
     getHashedIdm () {
-        console.log("HashedIdm: " + idnum_sha256);
+//        console.log("HashedIdm: " + idnum_sha256);
         return idnum_sha256;
     }
         
