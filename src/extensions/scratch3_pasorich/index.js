@@ -489,8 +489,14 @@ class Scratch3Pasorich {
     
     getHashIdm () {
 
-
-        return idnum;
+        const byteArray = new Uint8Array(idnum);
+        const hexCodes = [...byteArray].map(value => {
+          const hexCode = value.toString(16);
+          const paddedHexCode = hexCode.padStart(2, '0');
+          return paddedHexCode;
+        });
+        
+        return hexCodes.join('');
     }
         
     
