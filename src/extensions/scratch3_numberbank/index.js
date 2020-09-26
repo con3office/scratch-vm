@@ -13,9 +13,9 @@ const Cast = require('../../util/cast');
 const log = require('../../util/log');
 
 // Values
-var bankNum;
+var idnum;
+var cloudNum;
 var text_sha256;
-var id_;
 const ext_version = "NumberBank 0.1.0";
 
 
@@ -35,12 +35,12 @@ const menuIconURI = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iN
 
 
 
-function hexString(buffer) {
-    const byteArray = new Uint8Array(buffer);
+function hexString(textStr) {
+    const byteArray = new Uint8Array(textStr);
     const hexCodes = [...byteArray].map(value => {
-      const hexCode = value.toString(16);
-      const paddedHexCode = hexCode.padStart(2, '0');
-      return paddedHexCode;
+        const hexCode = value.toString(16);
+        const paddedHexCode = hexCode.padStart(2, '0');
+        return paddedHexCode;
     });
     return hexCodes.join('');
 }
@@ -80,46 +80,38 @@ class Scratch3Numberbank {
             blockIconURI: blockIconURI,
             blocks: [
                 {
-                    opcode: 'setHexkey',
+                    opcode: 'putCloud',
                     blockType: BlockType.COMMAND,
-                    text: 'key [TEXT]',
+                    text: 'put [KEY][NUMBER]',
                     arguments: {
-                        TEXT: {
+                        KEY: {
                             type: ArgumentType.STRING,
-                            defaultValue: "hello"
+                            defaultValue: "key"
+                        },
+                        NUMBER: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: "01234"
+                        }                    
+                    }
+                },
+                {
+                    opcode: 'getCloud',
+                    blockType: BlockType.COMMAND
+                    text: 'get [KEY]',
+                    arguments: {
+                        KEY: {
+                            type: ArgumentType.STRING,
+                            defaultValue: "key"
                         }
                     }
                 },
                 {
-                    opcode: 'getHashText',
-                    text: 'getHashText',
+                    opcode: 'getNumber',
+                    text: 'CloudNumber',
                     blockType: BlockType.REPORTER
                 },
-                {
-                    opcode: 'getIdm',
-                    text: 'Idm',
-                    blockType: BlockType.REPORTER
-                },
-                {
-                    opcode: 'getHashIdm',
-                    text: 'HashIdm',
-                    blockType: BlockType.REPORTER
-                }
-/**
-                ,
-                {
-                    opcode: 'openPasori',
-                    text: 'open PaSoRi',
-                    blockType: BlockType.COMMAND,
-                    text: 'open PaSoRi'
-                }
-                ,
-                {
-                    opcode: 'closePasori',
-                    text: 'close PaSoRi',
-                    blockType: BlockType.COMMAND,
-                    text: 'close PaSoRi'
-                }
+/*
+
 */
             ],
             menus: {
@@ -127,32 +119,33 @@ class Scratch3Numberbank {
         };
     }
 
-    setHexkey (args) {
-        text_sha256 = args.TEXT;
-    }
+    put2Cloud (args) {
+        if (!crypto || !crypto.subtle) {
+            throw Error("crypto.subtle is not supported.");
+        }
 
-    /**
-     * Get the browser.
-     * @return {number} - the user agent.
-     */
-    getBrowser () {
-        return navigator.userAgent;
-    }
+        crypto.subtle.digest('SHA-256', new TextEncoder().encode(args.KEY))
+        .then(keyStr => {
+            text_sha256 = hexString(keyStr);
+            sleep(15);
+    		console.log("HashedIdm: " + text_sha256);
+        });
 
+        cloudNum = args.NUMBER;
+        console.log("CloudNum: " + cloudNum);
 
-    getIdm () {
-//		console.log('=== S:getIdm ===');
-        return idnum;
     }
 
     
-    getHashText () {
+    getCloud (args) {
 
-        return text_sha256;
+
     }
-        
     
+    getNumber () {
 
+        return cloudNum;
+    }
 
 }
 
