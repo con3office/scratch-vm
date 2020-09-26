@@ -205,7 +205,19 @@ function session(ss_device) {
 						idmStr += idm[i].toString(16);
 					}
 					console.log("Idm: " + idmStr);
-					idnum = JSON.parse(JSON.stringify(idmStr));
+                    idnum = JSON.parse(JSON.stringify(idmStr));
+                    
+
+                    if (!crypto || !crypto.subtle) {
+                        throw Error("crypto.subtle is not supported.");
+                    }
+
+                    crypto.subtle.digest('SHA-256', new TextEncoder().encode(idnum))
+                    .then(x => {
+                        idnum_sha256 = hexString(x); // convert to hex string.
+                    });
+
+
             	}
             	
         	}else {
@@ -498,16 +510,6 @@ class Scratch3Pasorich {
     }
     
     getHashIdm () {
-
-        if (!crypto || !crypto.subtle) {
-            throw Error("crypto.subtle is not supported.");
-        }
-
-        crypto.subtle.digest('SHA-256', new TextEncoder().encode(idnum))
-        .then(x => {
-            idnum_sha256 = hexString(x); // convert to hex string.
-        });
-
         return idnum_sha256;
     }
         
