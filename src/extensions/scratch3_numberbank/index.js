@@ -24,7 +24,7 @@ var cloudNum;
 var text_sha256;
 var master_db;
 var card_db;
-const ext_version = "NumberBank 0.1.1";
+const ext_version = "NumberBank 0.1.1a";
 
 var firebaseConfig = {
     apiKey: "AIzaSyA1iKV2IluAbBaO0A8yrKbNi7odxE1AaX8",
@@ -83,7 +83,6 @@ class Scratch3Numberbank {
 		console.log(ext_version);
 
         firebase.initializeApp(firebaseConfig);
-        firebase.analytics();
         db = firebase.firestore();
 
         master_db = db.collection("master");
