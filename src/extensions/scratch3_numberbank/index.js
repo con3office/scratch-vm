@@ -24,7 +24,7 @@ var cloudNum;
 var text_sha256;
 var master_db;
 var card_db;
-const ext_version = "NumberBank 0.1.1b";
+const ext_version = "NumberBank 0.1.1c";
 
 var firebaseConfig = {
     apiKey: "AIzaSyA1iKV2IluAbBaO0A8yrKbNi7odxE1AaX8",
@@ -88,6 +88,7 @@ class Scratch3Numberbank {
         master_db = db.collection("master");
         card_db = db.collection("card");
 
+        sleep(20);
 
 
 //      console.log("init_done");
@@ -154,7 +155,7 @@ class Scratch3Numberbank {
         crypto.subtle.digest('SHA-256', new TextEncoder().encode(args.KEY))
         .then(keyStr => {
             text_sha256 = hexString(keyStr);
-            sleep(15);
+            sleep(20);
     		console.log("HashedIdm: " + text_sha256);
         });
 
