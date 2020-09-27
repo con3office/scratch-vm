@@ -96,7 +96,7 @@ class Scratch3Numberbank {
                 },
                 {
                     opcode: 'getCloud',
-                    blockType: BlockType.COMMAND
+                    blockType: BlockType.COMMAND,
                     text: 'get [KEY]',
                     arguments: {
                         KEY: {
