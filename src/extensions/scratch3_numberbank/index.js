@@ -24,7 +24,7 @@ var cloudNum;
 var text_sha256;
 var master_db;
 var card_db;
-const ext_version = "NumberBank 0.1.1c";
+const ext_version = "NumberBank 0.1.1d";
 
 var firebaseConfig = {
     apiKey: "AIzaSyA1iKV2IluAbBaO0A8yrKbNi7odxE1AaX8",
@@ -78,20 +78,27 @@ class Scratch3Numberbank {
          */
         this.runtime = runtime;
 
-//      console.log("initializing...");
+      console.log("initializing...");
 //		console.log("version:");
 		console.log(ext_version);
 
         firebase.initializeApp(firebaseConfig);
+        console.log("init_step00");
+
         db = firebase.firestore();
 
+        console.log("init_step01");
+
         master_db = db.collection("master");
+        console.log("init_step02");
         card_db = db.collection("card");
+
+        console.log("init_step03");
 
         sleep(20);
 
 
-//      console.log("init_done");
+      console.log("init_done");
 
 }
 
@@ -148,6 +155,8 @@ class Scratch3Numberbank {
 
     put2Cloud (args) {
 
+        console.log("put2Cloud...");
+
         if (!crypto || !crypto.subtle) {
             throw Error("crypto.subtle is not supported.");
         }
@@ -173,6 +182,8 @@ class Scratch3Numberbank {
             ed_msg.textContent = "エラー";
             console.error("Error writing document: ", error);
         });
+
+        console.log("put2Cloud...end");
 
 
     }
