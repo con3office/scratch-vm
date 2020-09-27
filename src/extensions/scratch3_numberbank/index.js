@@ -11,12 +11,31 @@ const ArgumentType = require('../../extension-support/argument-type');
 const BlockType = require('../../extension-support/block-type');
 const Cast = require('../../util/cast');
 const log = require('../../util/log');
+const firebase = require("firebase/app");
+require("firebase/auth");
+require("firebase/firestore");
 
 // Values
-var idnum;
+var db;
+var master_name = 'MasterNAME';
+var master_key = 'masmas';
+var card_key;
 var cloudNum;
 var text_sha256;
-const ext_version = "NumberBank 0.1.0";
+var master_db;
+var card_db;
+const ext_version = "NumberBank 0.1.1";
+
+var firebaseConfig = {
+    apiKey: "AIzaSyA1iKV2IluAbBaO0A8yrKbNi7odxE1AaX8",
+    authDomain: "numberbank-68d06.firebaseapp.com",
+    databaseURL: "https://numberbank-68d06.firebaseio.com",
+    projectId: "numberbank-68d06",
+    storageBucket: "numberbank-68d06.appspot.com",
+    messagingSenderId: "368738644656",
+    appId: "1:368738644656:web:c858b84c08784215ec8175",
+    measurementId: "G-DLFL2V0M98"
+  };
 
 
  /**
@@ -62,6 +81,14 @@ class Scratch3Numberbank {
 //      console.log("initializing...");
 //		console.log("version:");
 		console.log(ext_version);
+
+        firebase.initializeApp(firebaseConfig);
+        firebase.analytics();
+        db = firebase.firestore();
+
+        master_db = db.collection("master");
+        card_db = db.collection("card");
+
 
 
 //      console.log("init_done");
@@ -120,6 +147,7 @@ class Scratch3Numberbank {
     }
 
     put2Cloud (args) {
+
         if (!crypto || !crypto.subtle) {
             throw Error("crypto.subtle is not supported.");
         }
@@ -133,6 +161,19 @@ class Scratch3Numberbank {
 
         cloudNum = args.NUMBER;
         console.log("CloudNum: " + cloudNum);
+
+        //let  add_data = card_db.doc('number');
+
+        card_db.add({
+            master_key: master_key,
+            card_key: text_sha256,
+            number: cloudNum,
+        })
+        .catch(function(error) {
+            ed_msg.textContent = "エラー";
+            console.error("Error writing document: ", error);
+        });
+
 
     }
 
