@@ -22,7 +22,7 @@ var readingFlag = false;
 var connectingCount = 0;
 const intvalTime_long = 15;
 const intvalTime_short = 9;
-const PaSoRichVersion = "PaSoRich 0.5.3";
+const PaSoRichVersion = "PaSoRich 0.5.3a";
 
 
  /**
@@ -217,7 +217,7 @@ function session(ss_device) {
                     crypto.subtle.digest('SHA-256', new TextEncoder().encode(idnum))
                     .then(idnumStr => {
                         idnum_sha256 = hexString(idnumStr);
-                        sleep(intvalTime_long);
+                        sleep(20);
 //    					console.log("HashedIdm: " + idnum_sha256);
                     });
 
@@ -254,6 +254,7 @@ function session(ss_device) {
  * @param {Runtime} runtime - the runtime instantiating this block package.
  * @constructor
  */
+
 class Scratch3Pasorich {
     constructor (runtime) {
         /**
@@ -262,7 +263,7 @@ class Scratch3Pasorich {
          */
         this.runtime = runtime;
 
-//        console.log("initializing...");
+//      console.log("initializing...");
 //		console.log("navigator:");
 //		console.log(navigator);
 //		console.log("navigator.usb:");
@@ -417,7 +418,7 @@ class Scratch3Pasorich {
 
 //		idnum = '';
 
-//        console.log("read_11" + pasoriDevice);
+//      console.log("read_11" + pasoriDevice);
 
         if(pasoriDevice !== undefined){
 
