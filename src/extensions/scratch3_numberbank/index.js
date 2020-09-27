@@ -11,9 +11,9 @@ const ArgumentType = require('../../extension-support/argument-type');
 const BlockType = require('../../extension-support/block-type');
 const Cast = require('../../util/cast');
 const log = require('../../util/log');
-const firebase = require("../../../node_modules/firebase/app");
-require("../../../node_modules/firebase/auth");
-require("../../../node_modules/firebase/firestore");
+const firebase = require("firebase/app");
+require("firebase/auth");
+require("firebase/firestore");
 
 // Values
 var db;
@@ -24,7 +24,7 @@ var cloudNum;
 var text_sha256;
 var master_db;
 var card_db;
-const ext_version = "NumberBank 0.1.1d";
+const ext_version = "NumberBank 0.1.1e";
 
 var firebaseConfig = {
     apiKey: "AIzaSyA1iKV2IluAbBaO0A8yrKbNi7odxE1AaX8",
