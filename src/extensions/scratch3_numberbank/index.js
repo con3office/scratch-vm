@@ -33,7 +33,7 @@ var master_db;
 var bank_db;
 var card_db;
 var puttingFlag = false;
-const ext_version = "NumberBank 0.2.3a";
+const ext_version = "NumberBank 0.2.4";
 
 var firebaseConfig = {
     apiKey: "AIzaSyA1iKV2IluAbBaO0A8yrKbNi7odxE1AaX8",
@@ -215,7 +215,6 @@ class Scratch3Numberbank {
 
         console.log("putCloud...");
 
-
         bank_key = args.BANK;
         card_key = args.CARD;
 
@@ -228,7 +227,7 @@ class Scratch3Numberbank {
             throw Error("crypto.subtle is not supported.");
         }
 
-        if (args.BANK != '' && args.BANK != undefined){
+        if (bank_key != '' && bank_key != undefined){
             crypto.subtle.digest('SHA-256', new TextEncoder().encode(bank_key))
             .then(bankStr => {
                 bank_sha256 = hexString(bankStr);
@@ -301,7 +300,7 @@ class Scratch3Numberbank {
             throw Error("crypto.subtle is not supported.");
         }
 
-        if (args.BANK != '' && args.BANK != undefined){
+        if (bank_key != '' && bank_key != undefined){
             crypto.subtle.digest('SHA-256', new TextEncoder().encode(bank_key))
             .then(bankStr => {
                 bank_sha256 = hexString(bankStr);
