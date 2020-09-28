@@ -24,16 +24,18 @@ var master_key = '';
 var bank_name = '';
 var bank_key = '';
 var card_key = '';
+var uni_key = '';
 var setNum;
 var cloudNum;
 var master_sha256 = '';
 var bank_sha256 = '';
 var card_sha256 = '';
+var uni_sha256 = '';
 var master_db;
 var bank_db;
 var card_db;
 var puttingFlag = false;
-const ext_version = "NumberBank 0.2.4";
+const ext_version = "NumberBank 0.2.5";
 
 var firebaseConfig = {
     apiKey: "AIzaSyA1iKV2IluAbBaO0A8yrKbNi7odxE1AaX8",
@@ -97,7 +99,7 @@ class Scratch3Numberbank {
 
 //      console.log("initializing...");
 //      console.log("version:");
-//      console.log(ext_version);
+        console.log(ext_version);
 
         firebase.initializeApp(firebaseConfig);
 
@@ -105,8 +107,6 @@ class Scratch3Numberbank {
         master_db = db.collection("master");
         bank_db = db.collection("bank");
         card_db = db.collection("card");
-
-        sleep(20);
 
 //      console.log("init_done");
 
@@ -131,7 +131,7 @@ class Scratch3Numberbank {
                     blockType: BlockType.COMMAND,
                     text: formatMessage({
                         id: 'numberbank.putCloud',
-                        default: 'put [BANK][CARD][NUM]',
+                        default: 'put[NUM]to[CARD]of[BANK]',
                         description: 'saveFirebase'
                     }),
                     arguments: {
@@ -154,7 +154,7 @@ class Scratch3Numberbank {
                     blockType: BlockType.COMMAND,
                     text: formatMessage({
                         id: 'numberbank.getCloud',
-                        default: 'get Num of [BANK][CARD]',
+                        default: 'get Num of[CARD]of[BANK]',
                         description: 'readFirebase'
                     }),
                     arguments: {
@@ -172,7 +172,7 @@ class Scratch3Numberbank {
                     opcode: 'getNumber',
                     text: formatMessage({
                         id: 'numberbank.getNumber',
-                        default: 'CloudNumber',
+                        default: 'CloudNum',
                         description: 'getNumber'
                     }),
                     blockType: BlockType.REPORTER
@@ -182,7 +182,7 @@ class Scratch3Numberbank {
                     blockType: BlockType.COMMAND,
                     text: formatMessage({
                         id: 'numberbank.setMaster',
-                        default: 'set Master [KEY]',
+                        default: 'set Master[KEY]',
                         description: 'readFirebase'
                     }),
                     arguments: {
@@ -213,14 +213,17 @@ class Scratch3Numberbank {
         }
         puttingFlag = true;
 
-        console.log("putCloud...");
+//        console.log("putCloud...");
 
-        bank_key = args.BANK;
+        bank_key = bank_name = args.BANK;
         card_key = args.CARD;
+
+        uni_key = bank_key.trim().concat(card_key.trim());
+//        console.log("uni_key: " + uni_key);    
 
         if(args.NUM != '' && args.NUM != undefined){
             setNum = args.NUM;
-            console.log("setNum: " + setNum);    
+//            console.log("setNum: " + setNum);    
         }
         
         if (!crypto || !crypto.subtle) {
@@ -231,38 +234,43 @@ class Scratch3Numberbank {
             crypto.subtle.digest('SHA-256', new TextEncoder().encode(bank_key))
             .then(bankStr => {
                 bank_sha256 = hexString(bankStr);
-                console.log("bank_sha256: " + bank_sha256);    
-            })
-            .then(() => {
-                sleep(20);
+//                console.log("bank_sha256: " + bank_sha256);    
             })
             .then(() => {
                 crypto.subtle.digest('SHA-256', new TextEncoder().encode(card_key))
                 .then(cardStr => {
                     card_sha256 = hexString(cardStr);
-                    console.log("card_sha256: " + card_sha256);
+//                    console.log("card_sha256: " + card_sha256);
                 })
             })
             .then(() => {
-                console.log("master_sha256: " + master_sha256);
+                crypto.subtle.digest('SHA-256', new TextEncoder().encode(uni_key))
+                .then(uniStr => {
+                    uni_sha256 = hexString(uniStr);
+//                    console.log("uni_sha256: " + uni_sha256);
+                })
+            })
+            .then(() => {
+//                console.log("master_sha256: " + master_sha256);
 
                 master_db.doc(master_sha256).get().then(function(mkey) {
                     if (mkey.exists) {
 
-                        card_db.doc(card_sha256).set({
+                        card_db.doc(uni_sha256).set({
+                            number: setNum,
                             bank_key: bank_sha256,
                             card_key: card_sha256,
-                            number: setNum,
+                            master_key: master_sha256
                         })
                         .then(() => {
                             bank_db.doc(bank_sha256).set({
                                 bank_name: bank_name
                             })
-                            sleep(50);
+                            sleep(30);
                         })
                         .then(() => {
                             puttingFlag = false;
-                            console.log("putCloud...end");
+//                            console.log("putCloud...end");
                         })
                         .catch(function(error) {
                                 console.error("Error writing document: ", error);
@@ -270,7 +278,7 @@ class Scratch3Numberbank {
         
                     } else {
                         // doc.data() will be undefined in this case
-                        console.log("No Masterkey!");
+                        console.log("No MasterKey!");
                     }
 
                 }).catch(function(error) {
@@ -293,8 +301,13 @@ class Scratch3Numberbank {
             return;
         }
 
-        bank_key = args.BANK;
+//        console.log("getCloud...");
+
+        bank_key = bank_name = args.BANK;
         card_key = args.CARD;
+
+        uni_key = bank_key.trim().concat(card_key.trim());
+//        console.log("uni_key: " + uni_key);    
 
         if (!crypto || !crypto.subtle) {
             throw Error("crypto.subtle is not supported.");
@@ -304,37 +317,39 @@ class Scratch3Numberbank {
             crypto.subtle.digest('SHA-256', new TextEncoder().encode(bank_key))
             .then(bankStr => {
                 bank_sha256 = hexString(bankStr);
-                console.log("bank_sha256: " + bank_sha256);    
-            })
-            .then(() => {
-                sleep(20);
+//                console.log("bank_sha256: " + bank_sha256);    
             })
             .then(() => {
                 crypto.subtle.digest('SHA-256', new TextEncoder().encode(card_key))
                 .then(cardStr => {
                     card_sha256 = hexString(cardStr);
-                    console.log("card_sha256: " + card_sha256);
+//                    console.log("card_sha256: " + card_sha256);
                 })
             })
             .then(() => {
-                console.log("master_sha256: " + master_sha256);
+                crypto.subtle.digest('SHA-256', new TextEncoder().encode(uni_key))
+                .then(uniStr => {
+                    uni_sha256 = hexString(uniStr);
+//                    console.log("uni_sha256: " + uni_sha256);
+                })
+            })
+            .then(() => {
+//                console.log("master_sha256: " + master_sha256);
 
                 master_db.doc(master_sha256).get().then(function(mkey) {
                     if (mkey.exists) {
 
-                        card_db.doc(card_sha256).get()
+                        card_db.doc(uni_sha256).get()
                         .then((doc) => {
                             let data = doc.data();
-                            
                             cloudNum = data.number;
-                            
                         })                        
                         .then(() => {
-                            sleep(50);
+                            sleep(30);
                         })
                         .then(() => {
                             puttingFlag = false;
-                            console.log("getCloud...end");
+//                            console.log("getCloud...end");
                         })
                         .catch(function(error) {
                                 console.error("Error writing document: ", error);
@@ -342,7 +357,7 @@ class Scratch3Numberbank {
         
                     } else {
                         // doc.data() will be undefined in this case
-                        console.log("No Masterkey!");
+                        console.log("No MasterKey!");
                     }
 
                 }).catch(function(error) {
@@ -380,7 +395,8 @@ class Scratch3Numberbank {
         })
         .then(() => {
             sleep(20);
-            console.log("Masterkry:", master_key);
+//            console.log("MasterKey:", master_key);
+            console.log("MasterKey setted!");
         })
         .catch(function(error) {
             console.log("Error getting document:", error);
