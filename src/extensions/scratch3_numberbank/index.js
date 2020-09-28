@@ -33,7 +33,7 @@ var master_db;
 var bank_db;
 var card_db;
 var puttingFlag = false;
-const ext_version = "NumberBank 0.2.3";
+const ext_version = "NumberBank 0.2.3a";
 
 var firebaseConfig = {
     apiKey: "AIzaSyA1iKV2IluAbBaO0A8yrKbNi7odxE1AaX8",
@@ -395,7 +395,7 @@ class Scratch3Numberbank {
         const extTranslations = {
             'ja': {
                 'numberbank.putCloud': '[BANK]の[CARD]に[NUM]を登録',
-                'numberbank.getCloud': '[BANK]のCARD]から数字取得',
+                'numberbank.getCloud': '[BANK]の[CARD]から数字取得',
                 'numberbank.getNumber': 'クラウド数字',
                 'numberbank.setMaster': 'マスター[KEY]をセット'
             },
