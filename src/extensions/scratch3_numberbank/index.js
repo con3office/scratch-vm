@@ -33,7 +33,7 @@ var master_db;
 var bank_db;
 var card_db;
 var puttingFlag = false;
-const ext_version = "NumberBank 0.2.2";
+const ext_version = "NumberBank 0.2.3";
 
 var firebaseConfig = {
     apiKey: "AIzaSyA1iKV2IluAbBaO0A8yrKbNi7odxE1AaX8",
@@ -215,9 +215,6 @@ class Scratch3Numberbank {
 
         console.log("putCloud...");
 
-        if (!crypto || !crypto.subtle) {
-            throw Error("crypto.subtle is not supported.");
-        }
 
         bank_key = args.BANK;
         card_key = args.CARD;
@@ -227,6 +224,9 @@ class Scratch3Numberbank {
             console.log("setNum: " + setNum);    
         }
         
+        if (!crypto || !crypto.subtle) {
+            throw Error("crypto.subtle is not supported.");
+        }
 
         if (args.BANK != '' && args.BANK != undefined){
             crypto.subtle.digest('SHA-256', new TextEncoder().encode(bank_key))
@@ -292,6 +292,13 @@ class Scratch3Numberbank {
 
         if (args.BANK == '' || args.CARD == ''){
             return;
+        }
+
+        bank_key = args.BANK;
+        card_key = args.CARD;
+
+        if (!crypto || !crypto.subtle) {
+            throw Error("crypto.subtle is not supported.");
         }
 
         if (args.BANK != '' && args.BANK != undefined){
@@ -364,6 +371,10 @@ class Scratch3Numberbank {
         master_sha256 = '';
         master_key = args.KEY;
 
+        if (!crypto || !crypto.subtle) {
+            throw Error("crypto.subtle is not supported.");
+        }
+
         crypto.subtle.digest('SHA-256', new TextEncoder().encode(master_key))
         .then(masterStr => {
             master_sha256 = hexString(masterStr);
@@ -383,14 +394,14 @@ class Scratch3Numberbank {
         const localeSetup = formatMessage.setup();
         const extTranslations = {
             'ja': {
-                'numberbank.putCloud': '[BANK]に[CARD]で[NUM]を登録',
-                'numberbank.getCloud': '[BANK][CARD]から数字取得',
+                'numberbank.putCloud': '[BANK]の[CARD]に[NUM]を登録',
+                'numberbank.getCloud': '[BANK]のCARD]から数字取得',
                 'numberbank.getNumber': 'クラウド数字',
                 'numberbank.setMaster': 'マスター[KEY]をセット'
             },
             'ja-Hira': {
-                'numberbank.putCloud': '[BANK]に[CARD]で[NUM]をとうろく',
-                'numberbank.getCloud': '[BANK][CARD]からすうじ',
+                'numberbank.putCloud': '[BANK]の[CARD]に[NUM]をとうろく',
+                'numberbank.getCloud': '[BANK]の[CARD]からすうじ',
                 'numberbank.getNumber': 'クラウドすうじ',
                 'numberbank.setMaster': 'マスター[KEY]をセット'
             }
