@@ -33,7 +33,7 @@ var master_db;
 var bank_db;
 var card_db;
 var puttingFlag = false;
-const ext_version = "NumberBank 0.2.0";
+const ext_version = "NumberBank 0.2.1";
 
 var firebaseConfig = {
     apiKey: "AIzaSyA1iKV2IluAbBaO0A8yrKbNi7odxE1AaX8",
@@ -235,7 +235,7 @@ class Scratch3Numberbank {
                 console.log("bank_sha256: " + bank_sha256);    
             })
             .then(() => {
-                sleep(20)
+                sleep(20);
             })
             .then(() => {
                 crypto.subtle.digest('SHA-256', new TextEncoder().encode(card_key))
@@ -259,7 +259,7 @@ class Scratch3Numberbank {
                             bank_db.doc(bank_sha256).set({
                                 bank_name: bank_name
                             })
-                            sleep(100);
+                            sleep(50);
                         })
                         .then(() => {
                             puttingFlag = false;
@@ -273,6 +273,7 @@ class Scratch3Numberbank {
                         // doc.data() will be undefined in this case
                         console.log("No Masterkey!");
                     }
+                    
                 }).catch(function(error) {
                     console.log("Error getting document:", error);
                 });
@@ -300,7 +301,7 @@ class Scratch3Numberbank {
                 console.log("bank_sha256: " + bank_sha256);    
             })
             .then(() => {
-                sleep(20)
+                sleep(20);
             })
             .then(() => {
                 crypto.subtle.digest('SHA-256', new TextEncoder().encode(card_key))
@@ -323,7 +324,7 @@ class Scratch3Numberbank {
                             
                         })                        
                         .then(() => {
-                            sleep(100);
+                            sleep(50);
                         })
                         .then(() => {
                             puttingFlag = false;
@@ -337,6 +338,7 @@ class Scratch3Numberbank {
                         // doc.data() will be undefined in this case
                         console.log("No Masterkey!");
                     }
+
                 }).catch(function(error) {
                     console.log("Error getting document:", error);
                 });
@@ -347,9 +349,11 @@ class Scratch3Numberbank {
 
     }
 
+
     getNumber () {
         return cloudNum;
     }
+
 
     setMaster (args) {
 
@@ -365,17 +369,15 @@ class Scratch3Numberbank {
             master_sha256 = hexString(masterStr);
         })
         .then(() => {
-            sleep(20)
+            sleep(20);
             console.log("Masterkry:", master_key);
-
         })
         .catch(function(error) {
             console.log("Error getting document:", error);
         });
 
-
-
     }
+
 
     setupTranslations () {
         const localeSetup = formatMessage.setup();
