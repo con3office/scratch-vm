@@ -33,7 +33,7 @@ var master_db;
 var bank_db;
 var card_db;
 var puttingFlag = false;
-const ext_version = "NumberBank 0.2.1";
+const ext_version = "NumberBank 0.2.2";
 
 var firebaseConfig = {
     apiKey: "AIzaSyA1iKV2IluAbBaO0A8yrKbNi7odxE1AaX8",
@@ -247,8 +247,8 @@ class Scratch3Numberbank {
             .then(() => {
                 console.log("master_sha256: " + master_sha256);
 
-                master_db.doc(master_sha256).get().then(function(doc) {
-                    if (doc.exists) {
+                master_db.doc(master_sha256).get().then(function(mkey) {
+                    if (mkey.exists) {
 
                         card_db.doc(card_sha256).set({
                             bank_key: bank_sha256,
@@ -273,7 +273,7 @@ class Scratch3Numberbank {
                         // doc.data() will be undefined in this case
                         console.log("No Masterkey!");
                     }
-                    
+
                 }).catch(function(error) {
                     console.log("Error getting document:", error);
                 });
@@ -313,8 +313,8 @@ class Scratch3Numberbank {
             .then(() => {
                 console.log("master_sha256: " + master_sha256);
 
-                master_db.doc(master_sha256).get().then(function(doc) {
-                    if (doc.exists) {
+                master_db.doc(master_sha256).get().then(function(mkey) {
+                    if (mkey.exists) {
 
                         card_db.doc(card_sha256).get()
                         .then((doc) => {
