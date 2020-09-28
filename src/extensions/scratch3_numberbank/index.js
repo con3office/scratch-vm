@@ -145,7 +145,7 @@ class Scratch3Numberbank {
                         },
                         NUM: {
                             type: ArgumentType.NUMBER,
-                            defaultValue: '12345'
+                            defaultValue: '10'
                         }
                     }
                 },
@@ -177,6 +177,7 @@ class Scratch3Numberbank {
                     }),
                     blockType: BlockType.REPORTER
                 },
+                '---',
                 {
                     opcode: 'setMaster',
                     blockType: BlockType.COMMAND,
@@ -418,7 +419,7 @@ class Scratch3Numberbank {
                 'numberbank.putCloud': '[BANK]の[CARD]に[NUM]をとうろく',
                 'numberbank.getCloud': '[BANK]の[CARD]からすうじ',
                 'numberbank.getNumber': 'クラウドすうじ',
-                'numberbank.setMaster': 'マスター[KEY]をセット'
+                'numberbank.setMaster': 'ますたー[KEY]をセット'
             }
         };
         for (const locale in extTranslations) {

@@ -11,6 +11,7 @@ const ArgumentType = require('../../extension-support/argument-type');
 const BlockType = require('../../extension-support/block-type');
 const Cast = require('../../util/cast');
 const log = require('../../util/log');
+const formatMessage = require('format-message');
 
 //PaSoRich Values
 var pasoriDevice;
@@ -22,7 +23,7 @@ var readingFlag = false;
 var connectingCount = 0;
 const intvalTime_long = 15;
 const intvalTime_short = 9;
-const PaSoRichVersion = "PaSoRich 0.5.3a";
+const PaSoRichVersion = "PaSoRich 0.5.5";
 
 
  /**
@@ -343,6 +344,9 @@ class Scratch3Pasorich {
      * @returns {object} metadata for this extension and its blocks.
      */
     getInfo () {
+
+        this.setupTranslations();
+
         return {
             id: 'pasorich',
             name: 'PaSoRich',
@@ -351,56 +355,88 @@ class Scratch3Pasorich {
             blocks: [
                 {
                     opcode: 'openPasori',
-                    text: 'Connect',
+                    text: formatMessage({
+                        id: 'pasorich.Connect',
+                        default: 'Connect',
+                        description: 'openPasori'
+                    }),
                     blockType: BlockType.REPORTER
                 },
                 '---',
                 {
                     opcode: 'readPasori',
-                    text: 'read PaSoRi',
+                    text: formatMessage({
+                        id: 'pasorich.readPasori',
+                        default: 'read PaSoRi',
+                        description: 'readPasori'
+                    }),
                     blockType: BlockType.COMMAND,
-                    text: 'read PaSoRi'
                 },
                 {
                     opcode: 'getIdm',
-                    text: 'Idm',
-                    blockType: BlockType.REPORTER
-                },
-                {
-                    opcode: 'getHashedIdm',
-                    text: 'HashedIdm',
+                    text: formatMessage({
+                        id: 'pasorich.getIdm',
+                        default: 'Idm',
+                        description: 'getIdm'
+                    }),
                     blockType: BlockType.REPORTER
                 },
                 {
                     opcode: 'resetIdm',
-                    text: 'reset Idm',
+                    text: formatMessage({
+                        id: 'pasorich.resetIdm',
+                        default: 'reset Idm',
+                        description: 'resetIdm'
+                    }),
                     blockType: BlockType.COMMAND,
-                    text: 'reset Idm'
                 },
                 {
                     opcode: 'getReadingFlag',
-                    text: 'reading',
+                    text: formatMessage({
+                        id: 'pasorich.getReadingFlag',
+                        default: 'reading',
+                        description: 'getReadingFlag'
+                    }),
                     blockType: BlockType.BOOLEAN
                 },
                 {
                     opcode: 'getWaitingFlag',
-                    text: 'waiting',
+                    text: formatMessage({
+                        id: 'pasorich.getWaitingFlag',
+                        default: 'waiting',
+                        description: 'getWaitingFlag'
+                    }),
                     blockType: BlockType.BOOLEAN
                 }
 /**
                 ,
                 {
+                    opcode: 'getHashedIdm',
+                    text: formatMessage({
+                        id: 'pasorich.getHashedIdm',
+                        default: 'HashedIdm',
+                        description: 'getHashedIdm'
+                    }),
+                    blockType: BlockType.REPORTER
+                },
+                {
                     opcode: 'openPasori',
-                    text: 'open PaSoRi',
+                    text: formatMessage({
+                        id: 'pasorich.openPasori',
+                        default: 'open PaSoRi',
+                        description: 'openPasori'
+                    }),
                     blockType: BlockType.COMMAND,
-                    text: 'open PaSoRi'
                 }
                 ,
                 {
                     opcode: 'closePasori',
-                    text: 'close PaSoRi',
+                    text: formatMessage({
+                        id: 'pasorich.closePasori',
+                        default: 'close PaSoRi',
+                        description: 'closePasori'
+                    }),
                     blockType: BlockType.COMMAND,
-                    text: 'close PaSoRi'
                 }
 */
             ],
@@ -633,6 +669,36 @@ class Scratch3Pasorich {
         return pasoriDevice.close();
     }
 
+
+    setupTranslations () {
+        const localeSetup = formatMessage.setup();
+        const extTranslations = {
+            'ja': {
+                'pasorich.Connect': '接続',
+                'pasorich.readPasori': 'PaSoRi読取',
+                'pasorich.getIdm': 'Idm',
+                'pasorich.getHashedIdm': 'HexIdm',
+                'pasorich.resetIdm': 'Idmリセット',
+                'pasorich.getReadingFlag': '読取中',
+                'pasorich.getWaitingFlag': '待機中'
+            },
+            'ja-Hira': {
+                'pasorich.Connect': 'せつぞく',
+                'pasorich.readPasori': 'PaSoRiよみとり',
+                'pasorich.getIdm': 'Idm',
+                'pasorich.getHashedIdm': 'HexIdm',
+                'pasorich.resetIdm': 'Idmリセット',
+                'pasorich.getReadingFlag': 'よみとりちゅう',
+                'pasorich.getWaitingFlag': 'たいきちゅう'
+            }
+        };
+        for (const locale in extTranslations) {
+            if (!localeSetup.translations[locale]) {
+                localeSetup.translations[locale] = {};
+            }
+            Object.assign(localeSetup.translations[locale], extTranslations[locale]);
+        }
+    }
 
 }
 
