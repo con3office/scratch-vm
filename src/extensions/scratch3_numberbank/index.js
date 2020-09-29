@@ -19,15 +19,15 @@ const firebase = require("firebase");
 require("firebase/firestore");
 
 
-// Values
+// Variables
 var db;
 var master_key = '';
 var bank_name = '';
 var bank_key = '';
 var card_key = '';
 var uni_key = '';
-var setNum;
-var cloudNum;
+var setNum ='';
+var cloudNum = '';
 var master_sha256 = '';
 var bank_sha256 = '';
 var card_sha256 = '';
@@ -37,7 +37,7 @@ var bank_db;
 var card_db;
 var puttingFlag = false;
 const projectName ='numberbank-';
-const ext_version = "NumberBank 0.4.0";
+const ext_version = "NumberBank 0.4.1";
 
 var firebaseConfig = {
     apiKey: "AIzaSyA1iKV2IluAbBaO0A8yrKbNi7odxE1AaX8",
