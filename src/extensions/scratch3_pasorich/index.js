@@ -13,17 +13,21 @@ const Cast = require('../../util/cast');
 const log = require('../../util/log');
 const formatMessage = require('format-message');
 
-//PaSoRich Values
+// Variables
 var pasoriDevice;
 var idnum;
 var idnum_sha256;
-var isConnect = "Push to Connect.";
 var gr_arr;
 var readingFlag = false;
 var connectingCount = 0;
+var isConnect = formatMessage({
+    id: 'pasorich.push2Connect',
+    default: 'Push to Connect.',
+    description: 'push2Connect'
+});
 const intvalTime_long = 15;
 const intvalTime_short = 9;
-const PaSoRichVersion = "PaSoRich 0.5.5";
+const PaSoRichVersion = "PaSoRich 0.5.7";
 
 
  /**
@@ -349,7 +353,10 @@ class Scratch3Pasorich {
 
         return {
             id: 'pasorich',
-            name: 'PaSoRich',
+            name: formatMessage({
+                id: 'pasorich.PaSoRich',
+                default: 'PaSoRich'
+            }),
             menuIconURI: menuIconURI,
             blockIconURI: blockIconURI,
             blocks: [
@@ -418,26 +425,8 @@ class Scratch3Pasorich {
                         description: 'getHashedIdm'
                     }),
                     blockType: BlockType.REPORTER
-                },
-                {
-                    opcode: 'openPasori',
-                    text: formatMessage({
-                        id: 'pasorich.openPasori',
-                        default: 'open PaSoRi',
-                        description: 'openPasori'
-                    }),
-                    blockType: BlockType.COMMAND,
                 }
-                ,
-                {
-                    opcode: 'closePasori',
-                    text: formatMessage({
-                        id: 'pasorich.closePasori',
-                        default: 'close PaSoRi',
-                        description: 'closePasori'
-                    }),
-                    blockType: BlockType.COMMAND,
-                }
+
 */
             ],
             menus: {
@@ -447,6 +436,7 @@ class Scratch3Pasorich {
 
 
     readPasori () {
+
 //        console.log('=== S:readPaSoRi ===');
 
         if(readingFlag){return;}
@@ -531,7 +521,6 @@ class Scratch3Pasorich {
     }
 
 
-
     getIdm () {
 //		console.log('=== S:getIdm ===');
         return idnum;
@@ -553,7 +542,7 @@ class Scratch3Pasorich {
     }
 
     getHashedIdm () {
-        console.log("HashedIdm: " + idnum_sha256);
+//        console.log("HashedIdm: " + idnum_sha256);
         return idnum_sha256;
     }
 
@@ -562,66 +551,47 @@ class Scratch3Pasorich {
 //        console.log('=== S:openPaSoRi ===');
 
         if(readingFlag){
-            isConnect = "Reading...";
+            isConnect = formatMessage({
+                id: 'pasorich.ConnectReading',
+                default: 'Reading...',
+                description: 'ConnectReading'
+            });
             return isConnect;
         }
 
         if (pasoriDevice !== undefined && pasoriDevice !== null) {
             connectingCount = 0;
-            isConnect = "Connected...";
+            isConnect = formatMessage({
+                id: 'pasorich.ConnectConnected',
+                default: 'Connected...',
+                description: 'ConnectConnected'
+            });
             return isConnect;
 //            pasoriDevice.close();
 //            pasoriDevice = null;
         }
 
         if(connectingCount >= 1){
-            isConnect = "Connecting...";
+            isConnect = formatMessage({
+                id: 'pasorich.ConnectConnecting',
+                default: 'Connecting...',
+                description: 'ConnectConnecting'
+            });
             return isConnect;
         }
         else {
 
             connectingCount += 1;
 
-            isConnect = "Connecting...";
+            isConnect = formatMessage({
+                id: 'pasorich.ConnectConnecting',
+                default: 'Connecting...',
+                description: 'ConnectConnecting'
+            });
 
             if (connectingCount > 1){
                 return isConnect;
             }
-
-/*
-            var devicePromise = navigator.usb.getDevices();
-
-            while(devicePromise == undefined){
-                sleep(intvalTime_short);
-            }
-
-            if (devicePromise !== undefined) {
-
-                devicePromise.then(devices => {
-    //                console.log(devices);
-                    devices.map(selectedDevice => {
-                        pasoriDevice = selectedDevice;
-                        pasoriDevice.open()
-                        .then(() =>
-                            pasoriDevice.selectConfiguration(1)
-                        )
-                        .then(() =>
-                            pasoriDevice.claimInterface(0)
-                        );
-                    });
-                })
-                .then(() => {
-                    isConnect = "Success...";
-                    return isConnect;
-                })
-                .catch(error => {
-                    console.log(error);
-                    isConnect = "Failure...";
-                    return isConnect;
-                });
-            }
-
-*/
 
             var reqdevicePromise = navigator.usb.requestDevice({ filters: [{ vendorId: 0x054c }] });
 
@@ -644,14 +614,22 @@ class Scratch3Pasorich {
                 })
                 .then(() => {
                     connectingCount = 0;
-                    isConnect = "Success...";
+                    isConnect = formatMessage({
+                        id: 'pasorich.ConnectSuccess',
+                        default: 'Success...',
+                        description: 'ConnectSuccess'
+                    });
                     return isConnect;
                 })
                 .catch(error => {
                      console.log(error);
                      pasoriDevice = null;
                      connectingCount = 0;
-                     isConnect = "Failure...";
+                     isConnect = formatMessage({
+                        id: 'pasorich.ConnectFailure',
+                        default: 'Failure...',
+                        description: 'ConnectFailure'
+                    });
                      return isConnect;
                 });
             }
@@ -674,22 +652,36 @@ class Scratch3Pasorich {
         const localeSetup = formatMessage.setup();
         const extTranslations = {
             'ja': {
+                'pasorich.PaSoRich': 'パソリッチ',
                 'pasorich.Connect': '接続',
-                'pasorich.readPasori': 'PaSoRi読取',
+                'pasorich.readPasori': 'PaSoRi 読み取り',
                 'pasorich.getIdm': 'Idm',
                 'pasorich.getHashedIdm': 'HexIdm',
                 'pasorich.resetIdm': 'Idmリセット',
                 'pasorich.getReadingFlag': '読取中',
-                'pasorich.getWaitingFlag': '待機中'
+                'pasorich.getWaitingFlag': '待機中',
+                'pasorich.ConnectReading': '読取中...',
+                'pasorich.push2Connect': 'クリックして接続開始',
+                'pasorich.ConnectConnected': '接続完了...',
+                'pasorich.ConnectConnecting': '接続中...',
+                'pasorich.ConnectSuccess': '接続成功...',
+                'pasorich.ConnectFailure': '接続失敗...'
             },
             'ja-Hira': {
+                'pasorich.PaSoRich': 'ぱそりっち',
                 'pasorich.Connect': 'せつぞく',
-                'pasorich.readPasori': 'PaSoRiよみとり',
+                'pasorich.readPasori': 'PaSoRi よみとり',
                 'pasorich.getIdm': 'Idm',
                 'pasorich.getHashedIdm': 'HexIdm',
                 'pasorich.resetIdm': 'Idmリセット',
                 'pasorich.getReadingFlag': 'よみとりちゅう',
-                'pasorich.getWaitingFlag': 'たいきちゅう'
+                'pasorich.getWaitingFlag': 'たいきちゅう',
+                'pasorich.ConnectReading': 'よみとりちゅう...',
+                'pasorich.push2Connect': 'クリックしてせつぞくかいし',
+                'pasorich.ConnectConnected': 'せつぞくかんりょう...',
+                'pasorich.ConnectConnecting': 'せつぞくちゅう...',
+                'pasorich.ConnectSuccess': 'せつぞくせいこう...',
+                'pasorich.ConnectFailure': 'せつぞくしっぱい...'
             }
         };
         for (const locale in extTranslations) {
