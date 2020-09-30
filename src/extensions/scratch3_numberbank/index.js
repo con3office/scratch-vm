@@ -4,7 +4,7 @@
     Scratch3.0 Extension
 
     Web:
-    https://con3.com/sc2scratch/?page_id=372
+    https://con3.com/numberbank/
 
 */
 
@@ -36,8 +36,9 @@ var master_db;
 var bank_db;
 var card_db;
 var puttingFlag = false;
+var gettingFlag = false;
 const projectName ='numberbank-';
-const ext_version = "NumberBank 0.4.1";
+const ext_version = "NumberBank 0.5.0";
 
 var firebaseConfig = {
     apiKey: "AIzaSyA1iKV2IluAbBaO0A8yrKbNi7odxE1AaX8",
@@ -204,6 +205,15 @@ class Scratch3Numberbank {
                         }
                     }
                 },
+                {
+                    opcode: 'gettingDone',
+                    text: formatMessage({
+                        id: 'numberbank.gettingDone',
+                        default: 'Done',
+                        description: 'gettingDone'
+                    }),
+                    blockType: BlockType.BOOLEAN
+                },
 /*
                 {
                     opcode: 'getNumber',
@@ -257,7 +267,7 @@ class Scratch3Numberbank {
         if (args.BANK == '' || args.CARD == '' || args.NUM == '') {
             return;
         }
-
+        
         if (puttingFlag){
             return;
         }
@@ -305,33 +315,37 @@ class Scratch3Numberbank {
 
                 master_db.doc(master_sha256).get().then(function(mkey) {
                     if (mkey.exists) {
-
+                        const now = Date.now();
                         card_db.doc(uni_sha256).set({
                             number: setNum,
                             bank_key: bank_sha256,
                             card_key: card_sha256,
-                            master_key: master_sha256
+                            master_key: master_sha256,
+                            time_stamp: now
                         })
                         .then(() => {
                             bank_db.doc(bank_sha256).set({
                                 bank_name: bank_name
                             })
-                            sleep(30);
+                            sleep(20);
                         })
                         .then(() => {
                             puttingFlag = false;
 //                            console.log("putCloud...end");
                         })
                         .catch(function(error) {
-                                console.error("Error writing document: ", error);
+                            console.error("Error writing document: ", error);
+                            puttingFlag = false;
                         });
         
                     } else {
                         console.log("No MasterKey!");
+                        puttingFlag = false;
                     }
 
                 }).catch(function(error) {
                     console.log("Error getting document:", error);
+                    puttingFlag = false;
                 });
                 
             });
@@ -352,6 +366,12 @@ class Scratch3Numberbank {
         if (args.BANK == '' || args.CARD == ''){
             return;
         }
+
+        if (gettingFlag){
+            return;
+        }
+        gettingFlag = true;
+
 
 //        console.log("getCloud...");
 
@@ -401,7 +421,10 @@ class Scratch3Numberbank {
                                     let data = doc.data();
                                     cloudNum = data.number;
                                     variable.value = data.number;
-                                })                        
+                                })
+                                .then(() => {
+                                    gettingFlag = false;
+                                })                   
                                 .catch(function(error) {
                                         console.error("Error getting document: ", error);
                                 });
@@ -410,19 +433,23 @@ class Scratch3Numberbank {
 //                                console.log("No Card!");
                                 cloudNum = '';
                                 variable.value = '';
+                                gettingFlag = false;
                             }
 
                         }).catch(function(error) {
                             console.log("Error cheking document:", error);
+                            gettingFlag = false;
                         });
     
                     } else {
                         // doc.data() will be undefined in this case
                         console.log("No MasterKey!");
+                        gettingFlag = false;
                     }
 
                 }).catch(function(error) {
                     console.log("Error getting document:", error);
+                    gettingFlag = false;
                 });
                 
             });
@@ -432,6 +459,11 @@ class Scratch3Numberbank {
     }
 
 
+    gettingDone () {
+        return !gettingFlag;
+    }
+
+    
     getNumber () {
         return cloudNum;
     }
@@ -455,8 +487,8 @@ class Scratch3Numberbank {
             master_sha256 = hexString(masterStr);
         })
         .then(() => {
-            sleep(20);
 //            console.log("MasterKey:", master_key);
+//            console.log("master_sha256:", master_sha256);
             console.log("MasterKey setted!");
         })
         .catch(function(error) {
@@ -477,6 +509,7 @@ class Scratch3Numberbank {
                 'numberbank.putCloud': '[BANK]の[CARD]の数字を[NUM]にする',
                 'numberbank.getCloud': '[VAL]を[BANK]の[CARD]の数字にする',
                 'numberbank.getNumber': 'クラウド数字',
+                'numberbank.gettingDone': '取得完了',
                 'numberbank.setMaster': 'マスター[KEY]をセット'
             },
             'ja-Hira': {
@@ -487,6 +520,7 @@ class Scratch3Numberbank {
                 'numberbank.putCloud': '[BANK]の[CARD]のすうじを[NUM]にする',
                 'numberbank.getCloud': '[VAL]を[BANK]の[CARD]のすうじにする',
                 'numberbank.getNumber': 'クラウドすうじ',
+                'numberbank.gettingDone': 'しゅとくかんりょう',
                 'numberbank.setMaster': 'ますたー[KEY]をセット'
             }
         };
