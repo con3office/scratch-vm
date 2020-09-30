@@ -38,7 +38,7 @@ var card_db;
 var puttingFlag = false;
 var gettingFlag = false;
 const projectName ='numberbank-';
-const ext_version = "NumberBank 0.5.1";
+const ext_version = "NumberBank 0.5.1a";
 
 var firebaseConfig = {
     apiKey: "AIzaSyA1iKV2IluAbBaO0A8yrKbNi7odxE1AaX8",
@@ -208,7 +208,7 @@ class Scratch3Numberbank {
                     opcode: 'gettingDone',
                     text: formatMessage({
                         id: 'numberbank.gettingDone',
-                        default: 'Done',
+                        default: 'done',
                         description: 'gettingDone'
                     }),
                     blockType: BlockType.BOOLEAN
