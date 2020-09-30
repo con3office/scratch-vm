@@ -38,7 +38,7 @@ var card_db;
 var puttingFlag = false;
 var gettingFlag = false;
 const projectName ='numberbank-';
-const ext_version = "NumberBank 0.5.0";
+const ext_version = "NumberBank 0.5.1";
 
 var firebaseConfig = {
     apiKey: "AIzaSyA1iKV2IluAbBaO0A8yrKbNi7odxE1AaX8",
@@ -103,7 +103,6 @@ class Scratch3Numberbank {
         this.runtime = runtime;
 
 //      console.log("initializing...");
-//      console.log("version:");
         console.log(ext_version);
 
 
@@ -325,7 +324,8 @@ class Scratch3Numberbank {
                         })
                         .then(() => {
                             bank_db.doc(bank_sha256).set({
-                                bank_name: bank_name
+                                bank_name: bank_name,
+                                time_stamp: now
                             })
                             sleep(20);
                         })
@@ -463,7 +463,7 @@ class Scratch3Numberbank {
         return !gettingFlag;
     }
 
-    
+
     getNumber () {
         return cloudNum;
     }
@@ -492,7 +492,7 @@ class Scratch3Numberbank {
             console.log("MasterKey setted!");
         })
         .catch(function(error) {
-            console.log("Error getting document:", error);
+            console.log("Error setting MasterKey:", error);
         });
 
     }
