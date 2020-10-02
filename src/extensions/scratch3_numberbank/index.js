@@ -37,7 +37,7 @@ var bank_db;
 var card_db;
 var inoutFlag = false;
 const projectName ='numberbank-';
-const ext_version = "NumberBank 0.5.5";
+const ext_version = "NumberBank 0.5.6";
 
 var firebaseConfig = {
     apiKey: "AIzaSyA1iKV2IluAbBaO0A8yrKbNi7odxE1AaX8",
@@ -144,12 +144,12 @@ class Scratch3Numberbank {
             blockIconURI: blockIconURI,
             blocks: [
                 {
-                    opcode: 'putCloud',
+                    opcode: 'putNum',
                     blockType: BlockType.COMMAND,
                     text: formatMessage({
-                        id: 'numberbank.putCloud',
+                        id: 'numberbank.putNum',
                         default: 'put[NUM]to[CARD]of[BANK]',
-                        description: 'saveFirebase'
+                        description: 'put Num to Firebase'
                     }),
                     arguments: {
                         BANK: {
@@ -173,12 +173,12 @@ class Scratch3Numberbank {
                     }
                 },
                 {
-                    opcode: 'getCloud',
+                    opcode: 'setNum',
                     blockType: BlockType.COMMAND,
                     text: formatMessage({
-                        id: 'numberbank.getCloud',
+                        id: 'numberbank.setNum',
                         default: 'set [VAL] to Num of[CARD]of[BANK]',
-                        description: 'readFirebase'
+                        description: 'set Num by Firebase'
                     }),
                     arguments: {
                         BANK: {
@@ -212,17 +212,40 @@ class Scratch3Numberbank {
                     }),
                     blockType: BlockType.BOOLEAN
                 },
-/*
                 {
-                    opcode: 'getNumber',
+                    opcode: 'getNum',
+                    blockType: BlockType.COMMAND,
                     text: formatMessage({
-                        id: 'numberbank.getNumber',
-                        default: 'CloudNum',
-                        description: 'getNumber'
+                        id: 'numberbank.getNum',
+                        default: 'get Num of[CARD]of[BANK]',
+                        description: 'get Num from Firebase'
+                    }),
+                    arguments: {
+                        BANK: {
+                            type: ArgumentType.STRING,
+                            defaultValue: formatMessage({
+                                id: 'numberbank.argments.bank',
+                                default: 'bank'
+                            })
+                        },
+                        CARD: {
+                            type: ArgumentType.STRING,
+                            defaultValue: formatMessage({
+                                id: 'numberbank.argments.card',
+                                default: 'card'
+                            })
+                        }
+                    }
+                },
+                {
+                    opcode: 'repNum',
+                    text: formatMessage({
+                        id: 'numberbank.repNum',
+                        default: 'repNum',
+                        description: 'report Number'
                     }),
                     blockType: BlockType.REPORTER
                 },
-*/
                 '---',
                 {
                     opcode: 'setMaster',
@@ -256,7 +279,7 @@ class Scratch3Numberbank {
     }
 
 
-    putCloud (args) {
+    putNum (args) {
 
         if (master_sha256 == ''){
             return;
@@ -354,7 +377,7 @@ class Scratch3Numberbank {
     }
 
 
-    getCloud (args, util) {
+    setNum (args, util) {
 
         const variable = util.target.lookupOrCreateVariable(null, args.VAL);
 
@@ -371,8 +394,113 @@ class Scratch3Numberbank {
         }
         inoutFlag = true;
 
+//        console.log("setNum...");
 
-//        console.log("getCloud...");
+        bank_key = bank_name = args.BANK;
+        card_key = args.CARD;
+
+        uni_key = bank_key.trim().concat(card_key.trim());
+//        console.log("uni_key: " + uni_key);    
+
+        if (!crypto || !crypto.subtle) {
+            throw Error("crypto.subtle is not supported.");
+        }
+
+        if (bank_key != '' && bank_key != undefined){
+            crypto.subtle.digest('SHA-256', new TextEncoder().encode(bank_key))
+            .then(bankStr => {
+                bank_sha256 = hexString(bankStr);
+//                console.log("bank_sha256: " + bank_sha256);    
+            })
+            .then(() => {
+                crypto.subtle.digest('SHA-256', new TextEncoder().encode(card_key))
+                .then(cardStr => {
+                    card_sha256 = hexString(cardStr);
+//                    console.log("card_sha256: " + card_sha256);
+                })
+            })
+            .then(() => {
+                crypto.subtle.digest('SHA-256', new TextEncoder().encode(uni_key))
+                .then(uniStr => {
+                    uni_sha256 = hexString(uniStr);
+//                    console.log("uni_sha256: " + uni_sha256);
+                })
+            })
+            .then(() => {
+//                console.log("master_sha256: " + master_sha256);
+
+                master_db.doc(master_sha256).get().then(function(mkey) {
+
+                    if (mkey.exists) {
+
+                        card_db.doc(uni_sha256).get().then(function(ckey) {
+
+                            if (ckey.exists) {
+
+                                card_db.doc(uni_sha256).get()
+                                .then((doc) => {
+                                    let data = doc.data();
+//                                    cloudNum = data.number;
+                                    variable.value = data.number;
+                                })
+                                .then(() => {
+                                    inoutFlag = false;
+                                })                   
+                                .catch(function(error) {
+                                        console.error("Error getting document: ", error);
+                                });
+
+                            } else {
+//                                console.log("No Card!");
+//                                cloudNum = '';
+                                variable.value = '';
+                                inoutFlag = false;
+                            }
+
+                        }).catch(function(error) {
+                            console.log("Error cheking document:", error);
+                            inoutFlag = false;
+                        });
+    
+                    } else {
+                        // doc.data() will be undefined in this case
+                        console.log("No MasterKey!");
+                        inoutFlag = false;
+                    }
+
+                }).catch(function(error) {
+                    console.log("Error getting document:", error);
+                    inoutFlag = false;
+                });
+                
+            });
+
+        }
+
+    }
+
+
+    inoutDone () {
+        return !inoutFlag;
+    }
+
+    
+    getNum (args) {
+
+        if (master_sha256 == ''){
+            return;
+        }
+
+        if (args.BANK == '' || args.CARD == ''){
+            return;
+        }
+
+        if (inoutFlag){
+            return;
+        }
+        inoutFlag = true;
+
+//        console.log("getNum...");
 
         bank_key = bank_name = args.BANK;
         card_key = args.CARD;
@@ -419,7 +547,6 @@ class Scratch3Numberbank {
                                 .then((doc) => {
                                     let data = doc.data();
                                     cloudNum = data.number;
-                                    variable.value = data.number;
                                 })
                                 .then(() => {
                                     inoutFlag = false;
@@ -431,7 +558,6 @@ class Scratch3Numberbank {
                             } else {
 //                                console.log("No Card!");
                                 cloudNum = '';
-                                variable.value = '';
                                 inoutFlag = false;
                             }
 
@@ -458,12 +584,7 @@ class Scratch3Numberbank {
     }
 
 
-    inoutDone () {
-        return !inoutFlag;
-    }
-
-
-    getNumber () {
+    repNum () {
         return cloudNum;
     }
 
@@ -505,10 +626,11 @@ class Scratch3Numberbank {
                 'numberbank.argments.bank': 'バンク',
                 'numberbank.argments.card': 'カード',
                 'numberbank.argments.key': 'キー',
-                'numberbank.putCloud': '[BANK]の[CARD]の数字を[NUM]にする',
-                'numberbank.getCloud': '[VAL]を[BANK]の[CARD]の数字にする',
-                'numberbank.getNumber': 'クラウド数字',
+                'numberbank.putNum': '[BANK]の[CARD]の数字を[NUM]にする',
+                'numberbank.setNum': '[VAL]を[BANK]の[CARD]の数字にする',
                 'numberbank.inoutDone': '読み書き完了',
+                'numberbank.getNum': '[BANK]の[CARD]を読む',
+                'numberbank.repNum': 'クラウド数字',
                 'numberbank.setMaster': 'マスター[KEY]をセット'
             },
             'ja-Hira': {
@@ -516,10 +638,11 @@ class Scratch3Numberbank {
                 'numberbank.argments.bank': 'ばんく',
                 'numberbank.argments.card': 'かーど',
                 'numberbank.argments.key': 'きー',
-                'numberbank.putCloud': '[BANK]の[CARD]のすうじを[NUM]にする',
-                'numberbank.getCloud': '[VAL]を[BANK]の[CARD]のすうじにする',
-                'numberbank.getNumber': 'クラウドすうじ',
+                'numberbank.putNum': '[BANK]の[CARD]のすうじを[NUM]にする',
+                'numberbank.setNum': '[VAL]を[BANK]の[CARD]のすうじにする',
                 'numberbank.inoutDone': 'よみかきかんりょう',
+                'numberbank.getNum': '[BANK]の[CARD]をよむ',
+                'numberbank.repNum': 'クラウドすうじ',
                 'numberbank.setMaster': 'ますたー[KEY]をセット'
             }
         };
