@@ -35,10 +35,9 @@ var uni_sha256 = '';
 var master_db;
 var bank_db;
 var card_db;
-var puttingFlag = false;
-var gettingFlag = false;
+var inoutFlag = false;
 const projectName ='numberbank-';
-const ext_version = "NumberBank 0.5.1a";
+const ext_version = "NumberBank 0.5.5";
 
 var firebaseConfig = {
     apiKey: "AIzaSyA1iKV2IluAbBaO0A8yrKbNi7odxE1AaX8",
@@ -205,11 +204,11 @@ class Scratch3Numberbank {
                     }
                 },
                 {
-                    opcode: 'gettingDone',
+                    opcode: 'inoutDone',
                     text: formatMessage({
-                        id: 'numberbank.gettingDone',
+                        id: 'numberbank.inoutDone',
                         default: 'done',
-                        description: 'gettingDone'
+                        description: 'inoutDone'
                     }),
                     blockType: BlockType.BOOLEAN
                 },
@@ -267,10 +266,10 @@ class Scratch3Numberbank {
             return;
         }
         
-        if (puttingFlag){
+        if (inoutFlag){
             return;
         }
-        puttingFlag = true;
+        inoutFlag = true;
 
 //        console.log("putCloud...");
 
@@ -330,22 +329,22 @@ class Scratch3Numberbank {
                             sleep(20);
                         })
                         .then(() => {
-                            puttingFlag = false;
+                            inoutFlag = false;
 //                            console.log("putCloud...end");
                         })
                         .catch(function(error) {
                             console.error("Error writing document: ", error);
-                            puttingFlag = false;
+                            inoutFlag = false;
                         });
         
                     } else {
                         console.log("No MasterKey!");
-                        puttingFlag = false;
+                        inoutFlag = false;
                     }
 
                 }).catch(function(error) {
                     console.log("Error getting document:", error);
-                    puttingFlag = false;
+                    inoutFlag = false;
                 });
                 
             });
@@ -367,10 +366,10 @@ class Scratch3Numberbank {
             return;
         }
 
-        if (gettingFlag){
+        if (inoutFlag){
             return;
         }
-        gettingFlag = true;
+        inoutFlag = true;
 
 
 //        console.log("getCloud...");
@@ -423,7 +422,7 @@ class Scratch3Numberbank {
                                     variable.value = data.number;
                                 })
                                 .then(() => {
-                                    gettingFlag = false;
+                                    inoutFlag = false;
                                 })                   
                                 .catch(function(error) {
                                         console.error("Error getting document: ", error);
@@ -433,23 +432,23 @@ class Scratch3Numberbank {
 //                                console.log("No Card!");
                                 cloudNum = '';
                                 variable.value = '';
-                                gettingFlag = false;
+                                inoutFlag = false;
                             }
 
                         }).catch(function(error) {
                             console.log("Error cheking document:", error);
-                            gettingFlag = false;
+                            inoutFlag = false;
                         });
     
                     } else {
                         // doc.data() will be undefined in this case
                         console.log("No MasterKey!");
-                        gettingFlag = false;
+                        inoutFlag = false;
                     }
 
                 }).catch(function(error) {
                     console.log("Error getting document:", error);
-                    gettingFlag = false;
+                    inoutFlag = false;
                 });
                 
             });
@@ -459,8 +458,8 @@ class Scratch3Numberbank {
     }
 
 
-    gettingDone () {
-        return !gettingFlag;
+    inoutDone () {
+        return !inoutFlag;
     }
 
 
@@ -509,7 +508,7 @@ class Scratch3Numberbank {
                 'numberbank.putCloud': '[BANK]の[CARD]の数字を[NUM]にする',
                 'numberbank.getCloud': '[VAL]を[BANK]の[CARD]の数字にする',
                 'numberbank.getNumber': 'クラウド数字',
-                'numberbank.gettingDone': '取得完了',
+                'numberbank.inoutDone': '読み書き完了',
                 'numberbank.setMaster': 'マスター[KEY]をセット'
             },
             'ja-Hira': {
@@ -520,7 +519,7 @@ class Scratch3Numberbank {
                 'numberbank.putCloud': '[BANK]の[CARD]のすうじを[NUM]にする',
                 'numberbank.getCloud': '[VAL]を[BANK]の[CARD]のすうじにする',
                 'numberbank.getNumber': 'クラウドすうじ',
-                'numberbank.gettingDone': 'しゅとくかんりょう',
+                'numberbank.inoutDone': 'よみかきかんりょう',
                 'numberbank.setMaster': 'ますたー[KEY]をセット'
             }
         };
