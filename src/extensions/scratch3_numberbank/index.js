@@ -36,8 +36,9 @@ var master_db;
 var bank_db;
 var card_db;
 var inoutFlag = false;
+var intervalMs = 300;
 const projectName ='numberbank-';
-const ext_version = "NumberBank 0.5.6";
+const ext_version = "NumberBank 0.5.8";
 
 var firebaseConfig = {
     apiKey: "AIzaSyA1iKV2IluAbBaO0A8yrKbNi7odxE1AaX8",
@@ -73,6 +74,7 @@ function sleep(msec) {
         }, msec)
     );
 }
+
 
 function hexString(textStr) {
     const byteArray = new Uint8Array(textStr);
@@ -268,6 +270,7 @@ class Scratch3Numberbank {
             ],
             menus: {
                 valMenu: {
+                    acceptReporters: true,
                     items: 'getDynamicMenuItems'
                 }
             }
@@ -349,7 +352,6 @@ class Scratch3Numberbank {
                                 bank_name: bank_name,
                                 time_stamp: now
                             })
-                            sleep(20);
                         })
                         .then(() => {
                             inoutFlag = false;
@@ -373,6 +375,8 @@ class Scratch3Numberbank {
             });
 
         }
+
+        return sleep(intervalMs);
 
     }
 
@@ -476,6 +480,8 @@ class Scratch3Numberbank {
             });
 
         }
+
+        return sleep(intervalMs);
 
     }
 
@@ -581,10 +587,15 @@ class Scratch3Numberbank {
 
         }
 
+//        console.log('Done waiter start...');
+
+        return sleep(intervalMs);
+
     }
 
 
-    repNum () {
+
+    repNum (args, util) {
         return cloudNum;
     }
 
