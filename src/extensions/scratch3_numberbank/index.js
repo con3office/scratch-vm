@@ -40,7 +40,7 @@ var availableFlag = false;
 var intervalMs = 350;
 var intervalLong = 600;
 const projectName ='numberbank-';
-const ext_version = "NumberBank 0.6.1";
+const ext_version = "NumberBank 0.6.2";
 
 var firebaseConfig = {
     apiKey: "AIzaSyA1iKV2IluAbBaO0A8yrKbNi7odxE1AaX8",
@@ -537,7 +537,7 @@ class Scratch3Numberbank {
 
         }
 
-        return sleep(intervalMs);
+        return sleep(intervalLong);
 
     }
 
