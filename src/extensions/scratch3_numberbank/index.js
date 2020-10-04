@@ -36,9 +36,11 @@ var master_db;
 var bank_db;
 var card_db;
 var inoutFlag = false;
-var intervalMs = 300;
+var availableFlag = false;
+var intervalMs = 350;
+var intervalLong = 400;
 const projectName ='numberbank-';
-const ext_version = "NumberBank 0.5.8";
+const ext_version = "NumberBank 0.6.0";
 
 var firebaseConfig = {
     apiKey: "AIzaSyA1iKV2IluAbBaO0A8yrKbNi7odxE1AaX8",
@@ -214,6 +216,7 @@ class Scratch3Numberbank {
                     }),
                     blockType: BlockType.BOOLEAN
                 },
+                '---',
                 {
                     opcode: 'getNum',
                     blockType: BlockType.COMMAND,
@@ -243,10 +246,36 @@ class Scratch3Numberbank {
                     opcode: 'repNum',
                     text: formatMessage({
                         id: 'numberbank.repNum',
-                        default: 'repNum',
+                        default: 'cloudNum',
                         description: 'report Number'
                     }),
                     blockType: BlockType.REPORTER
+                },
+                '---',
+                {
+                    opcode: 'boolAvl',
+                    blockType: BlockType.BOOLEAN,
+                    text: formatMessage({
+                        id: 'numberbank.boolAvl',
+                        default: '[CARD]of[BANK] available?',
+                        description: 'report Number'
+                    }),
+                    arguments: {
+                        BANK: {
+                            type: ArgumentType.STRING,
+                            defaultValue: formatMessage({
+                                id: 'numberbank.argments.bank',
+                                default: 'bank'
+                            })
+                        },
+                        CARD: {
+                            type: ArgumentType.STRING,
+                            defaultValue: formatMessage({
+                                id: 'numberbank.argments.card',
+                                default: 'card'
+                            })
+                        }
+                    }
                 },
                 '---',
                 {
@@ -578,7 +607,8 @@ class Scratch3Numberbank {
                         inoutFlag = false;
                     }
 
-                }).catch(function(error) {
+                })
+                .catch(function(error) {
                     console.log("Error getting document:", error);
                     inoutFlag = false;
                 });
@@ -597,6 +627,94 @@ class Scratch3Numberbank {
 
     repNum (args, util) {
         return cloudNum;
+    }
+
+
+    boolAvl (args, util) {
+
+        if (master_sha256 == ''){
+            return;
+        }
+
+        if (args.BANK == '' || args.CARD == ''){
+            return;
+        }
+
+        if (inoutFlag){
+            return;
+        }
+        inoutFlag = true;
+
+        //console.log("boolAvl...");
+        sleep(intervalMs);
+
+        bank_key = bank_name = args.BANK;
+        card_key = args.CARD;
+
+        uni_key = bank_key.trim().concat(card_key.trim());
+        //console.log("uni_key: " + uni_key);    
+
+        if (!crypto || !crypto.subtle) {
+            throw Error("crypto.subtle is not supported.");
+        }
+
+        if (bank_key != '' && bank_key != undefined){
+
+            crypto.subtle.digest('SHA-256', new TextEncoder().encode(uni_key))
+            .then(uniStr => {
+                uni_sha256 = hexString(uniStr);
+                //console.log("uni_sha256: " + uni_sha256);
+            })
+            .then(() => {
+                //console.log("master_sha256: " + master_sha256);
+                
+                master_db.doc(master_sha256).get().then(function(mkey) {
+                
+                    if (mkey.exists) {
+
+                        card_db.doc(uni_sha256).get().then(function(ckey) {
+
+                            if (ckey.exists) {
+                                //console.log("Available!");
+                                inoutFlag = false;
+                                availableFlag = true;
+
+                            } else {
+                                //console.log("No Available!");
+                                inoutFlag = false;
+                                availableFlag = false;
+                            }
+
+                        }).catch(function(error) {
+                            console.log("Error cheking document:", error);
+                            inoutFlag = false;
+                            availableFlag = false;
+                        });
+    
+                    } else {
+                        // doc.data() will be undefined in this case
+                        console.log("No MasterKey!");
+                        inoutFlag = false;
+                        availableFlag = false;
+                    }
+                
+                })
+                .catch(function(error) {
+                    console.log("Error getting document:", error);
+                    inoutFlag = false;
+                    availableFlag = false;
+                });
+                                
+            })
+
+        }
+
+        return new Promise(resolve =>
+            setTimeout(() => {
+                resolve(availableFlag);
+            }, intervalLong)
+        );
+    
     }
 
 
@@ -642,6 +760,7 @@ class Scratch3Numberbank {
                 'numberbank.inoutDone': '読み書き完了',
                 'numberbank.getNum': '[BANK]の[CARD]を読む',
                 'numberbank.repNum': 'クラウド数字',
+                'numberbank.boolAvl': '[BANK]の[CARD]がある',
                 'numberbank.setMaster': 'マスター[KEY]をセット'
             },
             'ja-Hira': {
@@ -654,6 +773,7 @@ class Scratch3Numberbank {
                 'numberbank.inoutDone': 'よみかきかんりょう',
                 'numberbank.getNum': '[BANK]の[CARD]をよむ',
                 'numberbank.repNum': 'クラウドすうじ',
+                'numberbank.boolAvl': '[BANK]の[CARD]がある',
                 'numberbank.setMaster': 'ますたー[KEY]をセット'
             }
         };
