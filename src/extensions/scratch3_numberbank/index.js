@@ -38,9 +38,8 @@ var card_db;
 var inoutFlag = false;
 var availableFlag = false;
 var intervalMs = 50;
-var intervalLong = 1000;
 const projectName ='numberbank-';
-const ext_version = "NumberBank 0.6.9";
+const ext_version = "NumberBank 0.7.0";
 
 var firebaseConfig = {
     apiKey: "AIzaSyA1iKV2IluAbBaO0A8yrKbNi7odxE1AaX8",
@@ -88,7 +87,6 @@ function io_waiter(msec) {
         }, msec)
     )
     .catch(() => {
-        console.log('waiter loop!');
         return io_waiter(intervalMs);
     });
 }
@@ -104,11 +102,9 @@ function reportNum_waiter(msec) {
         }, msec)
     )
     .catch(() => {
-        console.log('waiter loop!');
         return reportNum_waiter(intervalMs);
     });
 }
-
 
 function available_waiter(msec) {
     return new Promise((resolve, reject) =>
@@ -121,7 +117,6 @@ function available_waiter(msec) {
         }, msec)
     )
     .catch(() => {
-        console.log('waiter loop!');
         return available_waiter(intervalMs);
     });
 }
@@ -135,6 +130,7 @@ function hexString(textStr) {
     });
     return hexCodes.join('');
 }
+
 
 /** Project Id for nb*/
 const prjtId = "68d06";
