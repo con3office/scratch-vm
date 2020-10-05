@@ -26,7 +26,7 @@ var bank_name = '';
 var bank_key = '';
 var card_key = '';
 var uni_key = '';
-var setNum ='';
+var settingNum ='';
 var cloudNum = '';
 var master_sha256 = '';
 var bank_sha256 = '';
@@ -37,10 +37,10 @@ var bank_db;
 var card_db;
 var inoutFlag = false;
 var availableFlag = false;
-var intervalMs = 350;
-var intervalLong = 600;
+var intervalMs = 50;
+var intervalLong = 1000;
 const projectName ='numberbank-';
-const ext_version = "NumberBank 0.6.2";
+const ext_version = "NumberBank 0.6.9";
 
 var firebaseConfig = {
     apiKey: "AIzaSyA1iKV2IluAbBaO0A8yrKbNi7odxE1AaX8",
@@ -77,6 +77,54 @@ function sleep(msec) {
     );
 }
 
+function io_waiter(msec) {
+    return new Promise((resolve, reject) =>
+        setTimeout(() => {
+            if(inoutFlag){
+                reject();
+            }else{
+                resolve();
+            }
+        }, msec)
+    )
+    .catch(() => {
+        console.log('waiter loop!');
+        return io_waiter(intervalMs);
+    });
+}
+
+function reportNum_waiter(msec) {
+    return new Promise((resolve, reject) =>
+        setTimeout(() => {
+            if(inoutFlag){
+                reject();
+            }else{
+                resolve(cloudNum);
+            }
+        }, msec)
+    )
+    .catch(() => {
+        console.log('waiter loop!');
+        return reportNum_waiter(intervalMs);
+    });
+}
+
+
+function available_waiter(msec) {
+    return new Promise((resolve, reject) =>
+        setTimeout(() => {
+            if(inoutFlag){
+                reject();
+            }else{
+                resolve(availableFlag);
+            }
+        }, msec)
+    )
+    .catch(() => {
+        console.log('waiter loop!');
+        return available_waiter(intervalMs);
+    });
+}
 
 function hexString(textStr) {
     const byteArray = new Uint8Array(textStr);
@@ -105,7 +153,7 @@ class Scratch3Numberbank {
         */
         this.runtime = runtime;
 
-//      console.log("initializing...");
+        //console.log("initializing...");
         console.log(ext_version);
 
 
@@ -126,7 +174,7 @@ class Scratch3Numberbank {
         bank_db = db.collection("bank");
         card_db = db.collection("card");
 
-//      console.log("init_done");
+        //console.log("init_done");
 
     }
 
@@ -208,6 +256,7 @@ class Scratch3Numberbank {
                         }
                     }
                 },
+                /*
                 {
                     opcode: 'inoutDone',
                     text: formatMessage({
@@ -217,6 +266,7 @@ class Scratch3Numberbank {
                     }),
                     blockType: BlockType.BOOLEAN
                 },
+                */
                 '---',
                 {
                     opcode: 'getNum',
@@ -353,17 +403,17 @@ class Scratch3Numberbank {
         }
         inoutFlag = true;
 
-//        console.log("putCloud...");
+        //console.log("putCloud...");
 
         bank_key = bank_name = args.BANK;
         card_key = args.CARD;
 
         uni_key = bank_key.trim().concat(card_key.trim());
-//        console.log("uni_key: " + uni_key);    
+        //console.log("uni_key: " + uni_key);    
 
         if(args.NUM != '' && args.NUM != undefined){
-            setNum = args.NUM;
-//            console.log("setNum: " + setNum);    
+            settingNum = args.NUM;
+            //console.log("settingNum: " + settingNum);    
         }
         
         if (!crypto || !crypto.subtle) {
@@ -374,30 +424,30 @@ class Scratch3Numberbank {
             crypto.subtle.digest('SHA-256', new TextEncoder().encode(bank_key))
             .then(bankStr => {
                 bank_sha256 = hexString(bankStr);
-//                console.log("bank_sha256: " + bank_sha256);    
+                //console.log("bank_sha256: " + bank_sha256);    
             })
             .then(() => {
                 crypto.subtle.digest('SHA-256', new TextEncoder().encode(card_key))
                 .then(cardStr => {
                     card_sha256 = hexString(cardStr);
-//                    console.log("card_sha256: " + card_sha256);
+                    //console.log("card_sha256: " + card_sha256);
                 })
             })
             .then(() => {
                 crypto.subtle.digest('SHA-256', new TextEncoder().encode(uni_key))
                 .then(uniStr => {
                     uni_sha256 = hexString(uniStr);
-//                    console.log("uni_sha256: " + uni_sha256);
+                    //console.log("uni_sha256: " + uni_sha256);
                 })
             })
             .then(() => {
-//                console.log("master_sha256: " + master_sha256);
+                //console.log("master_sha256: " + master_sha256);
 
                 master_db.doc(master_sha256).get().then(function(mkey) {
                     if (mkey.exists) {
                         const now = Date.now();
                         card_db.doc(uni_sha256).set({
-                            number: setNum,
+                            number: settingNum,
                             bank_key: bank_sha256,
                             card_key: card_sha256,
                             master_key: master_sha256,
@@ -411,7 +461,7 @@ class Scratch3Numberbank {
                         })
                         .then(() => {
                             inoutFlag = false;
-//                            console.log("putCloud...end");
+                            //console.log("putCloud...end");
                         })
                         .catch(function(error) {
                             console.error("Error writing document: ", error);
@@ -432,7 +482,7 @@ class Scratch3Numberbank {
 
         }
 
-        return sleep(intervalMs);
+        return io_waiter(intervalMs);
 
     }
 
@@ -454,13 +504,13 @@ class Scratch3Numberbank {
         }
         inoutFlag = true;
 
-//        console.log("setNum...");
+        //console.log("setNum...");
 
         bank_key = bank_name = args.BANK;
         card_key = args.CARD;
 
         uni_key = bank_key.trim().concat(card_key.trim());
-//        console.log("uni_key: " + uni_key);    
+        //console.log("uni_key: " + uni_key);    
 
         if (!crypto || !crypto.subtle) {
             throw Error("crypto.subtle is not supported.");
@@ -470,24 +520,24 @@ class Scratch3Numberbank {
             crypto.subtle.digest('SHA-256', new TextEncoder().encode(bank_key))
             .then(bankStr => {
                 bank_sha256 = hexString(bankStr);
-//                console.log("bank_sha256: " + bank_sha256);    
+                //console.log("bank_sha256: " + bank_sha256);    
             })
             .then(() => {
                 crypto.subtle.digest('SHA-256', new TextEncoder().encode(card_key))
                 .then(cardStr => {
                     card_sha256 = hexString(cardStr);
-//                    console.log("card_sha256: " + card_sha256);
+                    //console.log("card_sha256: " + card_sha256);
                 })
             })
             .then(() => {
                 crypto.subtle.digest('SHA-256', new TextEncoder().encode(uni_key))
                 .then(uniStr => {
                     uni_sha256 = hexString(uniStr);
-//                    console.log("uni_sha256: " + uni_sha256);
+                    //console.log("uni_sha256: " + uni_sha256);
                 })
             })
             .then(() => {
-//                console.log("master_sha256: " + master_sha256);
+                //console.log("master_sha256: " + master_sha256);
 
                 master_db.doc(master_sha256).get().then(function(mkey) {
 
@@ -500,7 +550,6 @@ class Scratch3Numberbank {
                                 card_db.doc(uni_sha256).get()
                                 .then((doc) => {
                                     let data = doc.data();
-//                                    cloudNum = data.number;
                                     variable.value = data.number;
                                 })
                                 .then(() => {
@@ -537,7 +586,7 @@ class Scratch3Numberbank {
 
         }
 
-        return sleep(intervalLong);
+        return io_waiter(intervalMs);
 
     }
 
@@ -562,13 +611,13 @@ class Scratch3Numberbank {
         }
         inoutFlag = true;
 
-//        console.log("getNum...");
+        //console.log("getNum...");
 
         bank_key = bank_name = args.BANK;
         card_key = args.CARD;
 
         uni_key = bank_key.trim().concat(card_key.trim());
-//        console.log("uni_key: " + uni_key);    
+        //console.log("uni_key: " + uni_key);    
 
         if (!crypto || !crypto.subtle) {
             throw Error("crypto.subtle is not supported.");
@@ -578,24 +627,24 @@ class Scratch3Numberbank {
             crypto.subtle.digest('SHA-256', new TextEncoder().encode(bank_key))
             .then(bankStr => {
                 bank_sha256 = hexString(bankStr);
-//                console.log("bank_sha256: " + bank_sha256);    
+                //console.log("bank_sha256: " + bank_sha256);    
             })
             .then(() => {
                 crypto.subtle.digest('SHA-256', new TextEncoder().encode(card_key))
                 .then(cardStr => {
                     card_sha256 = hexString(cardStr);
-//                    console.log("card_sha256: " + card_sha256);
+                    //console.log("card_sha256: " + card_sha256);
                 })
             })
             .then(() => {
                 crypto.subtle.digest('SHA-256', new TextEncoder().encode(uni_key))
                 .then(uniStr => {
                     uni_sha256 = hexString(uniStr);
-//                    console.log("uni_sha256: " + uni_sha256);
+                    //console.log("uni_sha256: " + uni_sha256);
                 })
             })
             .then(() => {
-//                console.log("master_sha256: " + master_sha256);
+                //console.log("master_sha256: " + master_sha256);
 
                 master_db.doc(master_sha256).get().then(function(mkey) {
 
@@ -618,7 +667,7 @@ class Scratch3Numberbank {
                                 });
 
                             } else {
-//                                console.log("No Card!");
+                                //console.log("No Card!");
                                 cloudNum = '';
                                 inoutFlag = false;
                             }
@@ -644,7 +693,7 @@ class Scratch3Numberbank {
 
         }
 
-        return sleep(intervalMs);
+        return io_waiter(intervalMs);
 
     }
 
@@ -753,12 +802,7 @@ class Scratch3Numberbank {
 
         }
 
-
-        return new Promise(resolve =>
-            setTimeout(() => {
-                resolve(cloudNum);
-            }, intervalLong)
-        );
+        return reportNum_waiter(intervalMs);
 
     }
 
@@ -779,8 +823,7 @@ class Scratch3Numberbank {
         }
         inoutFlag = true;
 
-        //console.log("boolAvl...");
-        sleep(intervalMs);
+        console.log("boolAvl...");
 
         bank_key = bank_name = args.BANK;
         card_key = args.CARD;
@@ -812,7 +855,6 @@ class Scratch3Numberbank {
                                 //console.log("Available!");
                                 inoutFlag = false;
                                 availableFlag = true;
-
                             } else {
                                 //console.log("No Available!");
                                 inoutFlag = false;
@@ -820,7 +862,7 @@ class Scratch3Numberbank {
                             }
 
                         }).catch(function(error) {
-                            console.log("Error cheking document:", error);
+                            console.log("Error checking document:", error);
                             inoutFlag = false;
                             availableFlag = false;
                         });
@@ -843,12 +885,8 @@ class Scratch3Numberbank {
 
         }
 
-        return new Promise(resolve =>
-            setTimeout(() => {
-                resolve(availableFlag);
-            }, intervalLong)
-        );
-    
+        return available_waiter(intervalMs);
+
     }
 
 
@@ -870,8 +908,8 @@ class Scratch3Numberbank {
             master_sha256 = hexString(masterStr);
         })
         .then(() => {
-//            console.log("MasterKey:", master_key);
-//            console.log("master_sha256:", master_sha256);
+            //console.log("MasterKey:", master_key);
+            //console.log("master_sha256:", master_sha256);
             console.log("MasterKey setted!");
         })
         .catch(function(error) {
