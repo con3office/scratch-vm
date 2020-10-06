@@ -26,8 +26,8 @@ var isConnect = formatMessage({
     default: 'Push to Connect.',
     description: 'push2Connect'
 });
-const intvalTime_short = 9;
-const PaSoRichVersion = "PaSoRich 0.6.5";
+const intvalTime_short = 12;
+const PaSoRichVersion = "PaSoRich 0.6.6";
 
 
  /**
@@ -100,7 +100,7 @@ function send(s_device, data) {
     inoutFlag = true;    
     let uint8a = new Uint8Array(data);
     //console.log("snd -> ");
-    s_device.transferOut(2, uint8a)
+    return s_device.transferOut(2, uint8a)
     .then(() => {inoutFlag = false;})
     .catch(() => {inoutFlag = false;});
 }
@@ -349,8 +349,8 @@ class Scratch3Pasorich {
             if (reqdevicePromise !== undefined) {
 
                 reqdevicePromise.then(selectedDevice => {
-                pasoriDevice = selectedDevice;
-                return pasoriDevice.open();
+                    pasoriDevice = selectedDevice;
+                    return pasoriDevice.open();
                 })
                 .then(() => {
                     return pasoriDevice.selectConfiguration(1);
@@ -486,7 +486,7 @@ class Scratch3Pasorich {
 
             if(pasoriDevice.opened && pasoriDevice !== null){
                 sleep(intvalTime_short);
-                session(pasoriDevice);
+                return session(pasoriDevice);
             }
             else{
 
@@ -657,7 +657,7 @@ class Scratch3Pasorich {
                     });
                     return isConnect;
                 })
-                .catch(error => {
+                .catch((error) => {
                      console.log(error);
                      pasoriDevice = null;
                      connectingCount = 0;
