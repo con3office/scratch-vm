@@ -39,7 +39,7 @@ var inoutFlag = false;
 var availableFlag = false;
 var intervalMs = 50;
 const projectName ='numberbank-';
-const ext_version = "NumberBank 0.7.1";
+const ext_version = "NumberBank 0.7.2";
 
 var firebaseConfig = {
     apiKey: "AIzaSyA1iKV2IluAbBaO0A8yrKbNi7odxE1AaX8",
@@ -197,7 +197,7 @@ class Scratch3Numberbank {
                     text: formatMessage({
                         id: 'numberbank.putNum',
                         default: 'put[NUM]to[CARD]of[BANK]',
-                        description: 'put Num to Firebase'
+                        description: 'put number to Firebase'
                     }),
                     arguments: {
                         BANK: {
@@ -226,8 +226,8 @@ class Scratch3Numberbank {
                     blockType: BlockType.COMMAND,
                     text: formatMessage({
                         id: 'numberbank.setNum',
-                        default: 'set [VAL] to Num of[CARD]of[BANK]',
-                        description: 'set Num by Firebase'
+                        default: 'set [VAL] to number of[CARD]of[BANK]',
+                        description: 'set number by Firebase'
                     }),
                     arguments: {
                         BANK: {
@@ -269,8 +269,8 @@ class Scratch3Numberbank {
                     blockType: BlockType.COMMAND,
                     text: formatMessage({
                         id: 'numberbank.getNum',
-                        default: 'get Num of[CARD]of[BANK]',
-                        description: 'get Num from Firebase'
+                        default: 'get number of[CARD]of[BANK]',
+                        description: 'get number from Firebase'
                     }),
                     arguments: {
                         BANK: {
@@ -293,7 +293,7 @@ class Scratch3Numberbank {
                     opcode: 'repNum',
                     text: formatMessage({
                         id: 'numberbank.repNum',
-                        default: 'cloudNum',
+                        default: 'cloud number',
                         description: 'report Number'
                     }),
                     blockType: BlockType.REPORTER
@@ -304,8 +304,8 @@ class Scratch3Numberbank {
                     blockType: BlockType.REPORTER,
                     text: formatMessage({
                         id: 'numberbank.repCloudNum',
-                        default: 'Num of[CARD]of[BANK]',
-                        description: 'report Cloud Number'
+                        default: 'number of[CARD]of[BANK]',
+                        description: 'report Cloud number'
                     }),
                     arguments: {
                         BANK: {
