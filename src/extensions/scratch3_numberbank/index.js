@@ -39,7 +39,7 @@ var inoutFlag = false;
 var availableFlag = false;
 var intervalMs = 50;
 const projectName ='numberbank-';
-const ext_version = "NumberBank 0.7.0";
+const ext_version = "NumberBank 0.7.1";
 
 var firebaseConfig = {
     apiKey: "AIzaSyA1iKV2IluAbBaO0A8yrKbNi7odxE1AaX8",
@@ -87,7 +87,7 @@ function io_waiter(msec) {
         }, msec)
     )
     .catch(() => {
-        return io_waiter(intervalMs);
+        return io_waiter(msec);
     });
 }
 
@@ -102,7 +102,7 @@ function reportNum_waiter(msec) {
         }, msec)
     )
     .catch(() => {
-        return reportNum_waiter(intervalMs);
+        return reportNum_waiter(msec);
     });
 }
 
@@ -117,7 +117,7 @@ function available_waiter(msec) {
         }, msec)
     )
     .catch(() => {
-        return available_waiter(intervalMs);
+        return available_waiter(msec);
     });
 }
 
@@ -399,7 +399,7 @@ class Scratch3Numberbank {
         }
         inoutFlag = true;
 
-        //console.log("putCloud...");
+        //console.log("putNum...");
 
         bank_key = bank_name = args.BANK;
         card_key = args.CARD;
@@ -457,7 +457,6 @@ class Scratch3Numberbank {
                         })
                         .then(() => {
                             inoutFlag = false;
-                            //console.log("putCloud...end");
                         })
                         .catch(function(error) {
                             console.error("Error writing document: ", error);
@@ -556,8 +555,7 @@ class Scratch3Numberbank {
                                 });
 
                             } else {
-//                                console.log("No Card!");
-//                                cloudNum = '';
+                                //console.log("No Card!");
                                 variable.value = '';
                                 inoutFlag = false;
                             }
@@ -819,7 +817,7 @@ class Scratch3Numberbank {
         }
         inoutFlag = true;
 
-        console.log("boolAvl...");
+        //console.log("boolAvl...");
 
         bank_key = bank_name = args.BANK;
         card_key = args.CARD;
