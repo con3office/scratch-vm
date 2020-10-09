@@ -20,28 +20,28 @@ require("firebase/firestore");
 
 
 // Variables
-var db;
-var master_key = '';
-var bank_name = '';
-var bank_key = '';
-var card_key = '';
-var uni_key = '';
-var settingNum ='';
-var cloudNum = '';
-var master_sha256 = '';
-var bank_sha256 = '';
-var card_sha256 = '';
-var uni_sha256 = '';
-var master_db;
-var bank_db;
-var card_db;
-var inoutFlag = false;
-var availableFlag = false;
-var intervalMs = 50;
+let firestoreDb;
+let masterDb;
+let bankDb;
+let cardDb;
+let masterKey = '';
+let bankName = '';
+let bankKey = '';
+let cardKey = '';
+let uniKey = '';
+let cloudNum = '';
+let settingNum ='';
+let masterSha256 = '';
+let bankSha256 = '';
+let cardSha256 = '';
+let uniSha256 = '';
+let inoutFlag = false;
+let availableFlag = false;
+let intervalMs = 50;
 const projectName ='numberbank-';
-const ext_version = "NumberBank 0.7.2";
+const extVersion = "NumberBank 0.7.3";
 
-var firebaseConfig = {
+let firebaseConfig = {
     apiKey: "AIzaSyA1iKV2IluAbBaO0A8yrKbNi7odxE1AaX8",
     authDomain: ".firebaseapp.com",
     databaseURL: ".firebaseio.com",
@@ -76,7 +76,7 @@ function sleep(msec) {
     );
 }
 
-function io_waiter(msec) {
+function ioWaiter(msec) {
     return new Promise((resolve, reject) =>
         setTimeout(() => {
             if(inoutFlag){
@@ -87,11 +87,11 @@ function io_waiter(msec) {
         }, msec)
     )
     .catch(() => {
-        return io_waiter(msec);
+        return ioWaiter(msec);
     });
 }
 
-function reportNum_waiter(msec) {
+function reportNumWaiter(msec) {
     return new Promise((resolve, reject) =>
         setTimeout(() => {
             if(inoutFlag){
@@ -102,11 +102,11 @@ function reportNum_waiter(msec) {
         }, msec)
     )
     .catch(() => {
-        return reportNum_waiter(msec);
+        return reportNumWaiter(msec);
     });
 }
 
-function available_waiter(msec) {
+function availableWaiter(msec) {
     return new Promise((resolve, reject) =>
         setTimeout(() => {
             if(inoutFlag){
@@ -117,7 +117,7 @@ function available_waiter(msec) {
         }, msec)
     )
     .catch(() => {
-        return available_waiter(msec);
+        return availableWaiter(msec);
     });
 }
 
@@ -150,25 +150,25 @@ class Scratch3Numberbank {
         this.runtime = runtime;
 
         //console.log("initializing...");
-        console.log(ext_version);
+        console.log(extVersion);
 
 
         /** Firebase initilizing */
-        var fb_id = projectName.concat(prjtId);
+        let fb_id = projectName.concat(prjtId);
         firebaseConfig.projectId = fb_id;
-        var fb_dm = fb_id.concat(firebaseConfig.authDomain);
+        let fb_dm = fb_id.concat(firebaseConfig.authDomain);
         firebaseConfig.authDomain = fb_dm;
-        var fb_sb = fb_id.concat(firebaseConfig.storageBucket);
+        let fb_sb = fb_id.concat(firebaseConfig.storageBucket);
         firebaseConfig.storageBucket = fb_sb;
-        var fb_ul = 'https://'.concat(fb_id).concat(firebaseConfig.databaseURL);
+        let fb_ul = 'https://'.concat(fb_id).concat(firebaseConfig.databaseURL);
         firebaseConfig.databaseURL = fb_ul;
 
         firebase.initializeApp(firebaseConfig);
 
-        db = firebase.firestore();
-        master_db = db.collection("master");
-        bank_db = db.collection("bank");
-        card_db = db.collection("card");
+        firestoreDb = firebase.firestore();
+        masterDb = firestoreDb.collection("master");
+        bankDb = firestoreDb.collection("bank");
+        cardDb = firestoreDb.collection("card");
 
         //console.log("init_done");
 
@@ -252,17 +252,6 @@ class Scratch3Numberbank {
                         }
                     }
                 },
-                /*
-                {
-                    opcode: 'inoutDone',
-                    text: formatMessage({
-                        id: 'numberbank.inoutDone',
-                        default: 'done',
-                        description: 'inoutDone'
-                    }),
-                    blockType: BlockType.BOOLEAN
-                },
-                */
                 '---',
                 {
                     opcode: 'getNum',
@@ -378,6 +367,7 @@ class Scratch3Numberbank {
             }
         };
     }
+    
 
     getDynamicMenuItems () {
         return this.runtime.getEditingTarget().getAllVariableNamesInScopeByType(Variable.SCALAR_TYPE);
@@ -386,26 +376,20 @@ class Scratch3Numberbank {
 
     putNum (args) {
 
-        if (master_sha256 == ''){
-            return;
-        }
+        if (masterSha256 == ''){ return; }
 
-        if (args.BANK == '' || args.CARD == '' || args.NUM == '') {
-            return;
-        }
+        if (args.BANK == '' || args.CARD == '' || args.NUM == '') { return; }
         
-        if (inoutFlag){
-            return;
-        }
+        if (inoutFlag){ return; }
         inoutFlag = true;
 
         //console.log("putNum...");
 
-        bank_key = bank_name = args.BANK;
-        card_key = args.CARD;
+        bankKey = bankName = args.BANK;
+        cardKey = args.CARD;
 
-        uni_key = bank_key.trim().concat(card_key.trim());
-        //console.log("uni_key: " + uni_key);    
+        uniKey = bankKey.trim().concat(cardKey.trim());
+        //console.log("uniKey: " + uniKey);    
 
         if(args.NUM != '' && args.NUM != undefined){
             settingNum = args.NUM;
@@ -416,42 +400,42 @@ class Scratch3Numberbank {
             throw Error("crypto.subtle is not supported.");
         }
 
-        if (bank_key != '' && bank_key != undefined){
-            crypto.subtle.digest('SHA-256', new TextEncoder().encode(bank_key))
+        if (bankKey != '' && bankKey != undefined){
+            crypto.subtle.digest('SHA-256', new TextEncoder().encode(bankKey))
             .then(bankStr => {
-                bank_sha256 = hexString(bankStr);
-                //console.log("bank_sha256: " + bank_sha256);    
+                bankSha256 = hexString(bankStr);
+                //console.log("bankSha256: " + bankSha256);    
             })
             .then(() => {
-                crypto.subtle.digest('SHA-256', new TextEncoder().encode(card_key))
+                crypto.subtle.digest('SHA-256', new TextEncoder().encode(cardKey))
                 .then(cardStr => {
-                    card_sha256 = hexString(cardStr);
-                    //console.log("card_sha256: " + card_sha256);
+                    cardSha256 = hexString(cardStr);
+                    //console.log("cardSha256: " + cardSha256);
                 })
             })
             .then(() => {
-                crypto.subtle.digest('SHA-256', new TextEncoder().encode(uni_key))
+                crypto.subtle.digest('SHA-256', new TextEncoder().encode(uniKey))
                 .then(uniStr => {
-                    uni_sha256 = hexString(uniStr);
-                    //console.log("uni_sha256: " + uni_sha256);
+                    uniSha256 = hexString(uniStr);
+                    //console.log("uniSha256: " + uniSha256);
                 })
             })
             .then(() => {
-                //console.log("master_sha256: " + master_sha256);
+                //console.log("masterSha256: " + masterSha256);
 
-                master_db.doc(master_sha256).get().then(function(mkey) {
+                masterDb.doc(masterSha256).get().then(function(mkey) {
                     if (mkey.exists) {
                         const now = Date.now();
-                        card_db.doc(uni_sha256).set({
+                        cardDb.doc(uniSha256).set({
                             number: settingNum,
-                            bank_key: bank_sha256,
-                            card_key: card_sha256,
-                            master_key: master_sha256,
+                            bank_key: bankSha256,
+                            card_key: cardSha256,
+                            master_key: masterSha256,
                             time_stamp: now
                         })
                         .then(() => {
-                            bank_db.doc(bank_sha256).set({
-                                bank_name: bank_name,
+                            bankDb.doc(bankSha256).set({
+                                bank_name: bankName,
                                 time_stamp: now
                             })
                         })
@@ -477,72 +461,66 @@ class Scratch3Numberbank {
 
         }
 
-        return io_waiter(intervalMs);
+        return ioWaiter(intervalMs);
 
     }
 
 
     setNum (args, util) {
 
-        const variable = util.target.lookupOrCreateVariable(null, args.VAL);
+        if (masterSha256 == ''){ return; }
 
-        if (master_sha256 == ''){
-            return;
-        }
+        if (args.BANK == '' || args.CARD == ''){ return; }
 
-        if (args.BANK == '' || args.CARD == ''){
-            return;
-        }
-
-        if (inoutFlag){
-            return;
-        }
+        if (inoutFlag){ return; }
         inoutFlag = true;
 
         //console.log("setNum...");
 
-        bank_key = bank_name = args.BANK;
-        card_key = args.CARD;
+        const variable = util.target.lookupOrCreateVariable(null, args.VAL);
 
-        uni_key = bank_key.trim().concat(card_key.trim());
-        //console.log("uni_key: " + uni_key);    
+        bankKey = bankName = args.BANK;
+        cardKey = args.CARD;
+
+        uniKey = bankKey.trim().concat(cardKey.trim());
+        //console.log("uniKey: " + uniKey);    
 
         if (!crypto || !crypto.subtle) {
             throw Error("crypto.subtle is not supported.");
         }
 
-        if (bank_key != '' && bank_key != undefined){
-            crypto.subtle.digest('SHA-256', new TextEncoder().encode(bank_key))
+        if (bankKey != '' && bankKey != undefined){
+            crypto.subtle.digest('SHA-256', new TextEncoder().encode(bankKey))
             .then(bankStr => {
-                bank_sha256 = hexString(bankStr);
-                //console.log("bank_sha256: " + bank_sha256);    
+                bankSha256 = hexString(bankStr);
+                //console.log("bankSha256: " + bankSha256);    
             })
             .then(() => {
-                crypto.subtle.digest('SHA-256', new TextEncoder().encode(card_key))
+                crypto.subtle.digest('SHA-256', new TextEncoder().encode(cardKey))
                 .then(cardStr => {
-                    card_sha256 = hexString(cardStr);
-                    //console.log("card_sha256: " + card_sha256);
+                    cardSha256 = hexString(cardStr);
+                    //console.log("cardSha256: " + cardSha256);
                 })
             })
             .then(() => {
-                crypto.subtle.digest('SHA-256', new TextEncoder().encode(uni_key))
+                crypto.subtle.digest('SHA-256', new TextEncoder().encode(uniKey))
                 .then(uniStr => {
-                    uni_sha256 = hexString(uniStr);
-                    //console.log("uni_sha256: " + uni_sha256);
+                    uniSha256 = hexString(uniStr);
+                    //console.log("uniSha256: " + uniSha256);
                 })
             })
             .then(() => {
-                //console.log("master_sha256: " + master_sha256);
+                //console.log("masterSha256: " + masterSha256);
 
-                master_db.doc(master_sha256).get().then(function(mkey) {
+                masterDb.doc(masterSha256).get().then(function(mkey) {
 
                     if (mkey.exists) {
 
-                        card_db.doc(uni_sha256).get().then(function(ckey) {
+                        cardDb.doc(uniSha256).get().then(function(ckey) {
 
                             if (ckey.exists) {
 
-                                card_db.doc(uni_sha256).get()
+                                cardDb.doc(uniSha256).get()
                                 .then((doc) => {
                                     let data = doc.data();
                                     variable.value = data.number;
@@ -580,7 +558,7 @@ class Scratch3Numberbank {
 
         }
 
-        return io_waiter(intervalMs);
+        return ioWaiter(intervalMs);
 
     }
 
@@ -592,63 +570,57 @@ class Scratch3Numberbank {
     
     getNum (args) {
 
-        if (master_sha256 == ''){
-            return;
-        }
+        if (masterSha256 == ''){ return; }
 
-        if (args.BANK == '' || args.CARD == ''){
-            return;
-        }
+        if (args.BANK == '' || args.CARD == ''){ return; }
 
-        if (inoutFlag){
-            return;
-        }
+        if (inoutFlag){ return; }
         inoutFlag = true;
 
         //console.log("getNum...");
 
-        bank_key = bank_name = args.BANK;
-        card_key = args.CARD;
+        bankKey = bankName = args.BANK;
+        cardKey = args.CARD;
 
-        uni_key = bank_key.trim().concat(card_key.trim());
-        //console.log("uni_key: " + uni_key);    
+        uniKey = bankKey.trim().concat(cardKey.trim());
+        //console.log("uniKey: " + uniKey);    
 
         if (!crypto || !crypto.subtle) {
             throw Error("crypto.subtle is not supported.");
         }
 
-        if (bank_key != '' && bank_key != undefined){
-            crypto.subtle.digest('SHA-256', new TextEncoder().encode(bank_key))
+        if (bankKey != '' && bankKey != undefined){
+            crypto.subtle.digest('SHA-256', new TextEncoder().encode(bankKey))
             .then(bankStr => {
-                bank_sha256 = hexString(bankStr);
-                //console.log("bank_sha256: " + bank_sha256);    
+                bankSha256 = hexString(bankStr);
+                //console.log("bankSha256: " + bankSha256);    
             })
             .then(() => {
-                crypto.subtle.digest('SHA-256', new TextEncoder().encode(card_key))
+                crypto.subtle.digest('SHA-256', new TextEncoder().encode(cardKey))
                 .then(cardStr => {
-                    card_sha256 = hexString(cardStr);
-                    //console.log("card_sha256: " + card_sha256);
+                    cardSha256 = hexString(cardStr);
+                    //console.log("cardSha256: " + cardSha256);
                 })
             })
             .then(() => {
-                crypto.subtle.digest('SHA-256', new TextEncoder().encode(uni_key))
+                crypto.subtle.digest('SHA-256', new TextEncoder().encode(uniKey))
                 .then(uniStr => {
-                    uni_sha256 = hexString(uniStr);
-                    //console.log("uni_sha256: " + uni_sha256);
+                    uniSha256 = hexString(uniStr);
+                    //console.log("uniSha256: " + uniSha256);
                 })
             })
             .then(() => {
-                //console.log("master_sha256: " + master_sha256);
+                //console.log("masterSha256: " + masterSha256);
 
-                master_db.doc(master_sha256).get().then(function(mkey) {
+                masterDb.doc(masterSha256).get().then(function(mkey) {
 
                     if (mkey.exists) {
 
-                        card_db.doc(uni_sha256).get().then(function(ckey) {
+                        cardDb.doc(uniSha256).get().then(function(ckey) {
 
                             if (ckey.exists) {
 
-                                card_db.doc(uni_sha256).get()
+                                cardDb.doc(uniSha256).get()
                                 .then((doc) => {
                                     let data = doc.data();
                                     cloudNum = data.number;
@@ -687,10 +659,9 @@ class Scratch3Numberbank {
 
         }
 
-        return io_waiter(intervalMs);
+        return ioWaiter(intervalMs);
 
     }
-
 
 
     repNum (args, util) {
@@ -700,64 +671,57 @@ class Scratch3Numberbank {
 
     repCloudNum (args) {
 
+        if (masterSha256 == ''){ return; }
 
-        if (master_sha256 == ''){
-            return;
-        }
+        if (args.BANK == '' || args.CARD == ''){ return; }
 
-        if (args.BANK == '' || args.CARD == ''){
-            return;
-        }
-
-        if (inoutFlag){
-            return;
-        }
+        if (inoutFlag){ return; }
         inoutFlag = true;
 
         //console.log("repCloudNum...");
 
-        bank_key = bank_name = args.BANK;
-        card_key = args.CARD;
+        bankKey = bankName = args.BANK;
+        cardKey = args.CARD;
 
-        uni_key = bank_key.trim().concat(card_key.trim());
-        //console.log("uni_key: " + uni_key);
+        uniKey = bankKey.trim().concat(cardKey.trim());
+        //console.log("uniKey: " + uniKey);
 
         if (!crypto || !crypto.subtle) {
             throw Error("crypto.subtle is not supported.");
         }
 
-        if (bank_key != '' && bank_key != undefined){
-            crypto.subtle.digest('SHA-256', new TextEncoder().encode(bank_key))
+        if (bankKey != '' && bankKey != undefined){
+            crypto.subtle.digest('SHA-256', new TextEncoder().encode(bankKey))
             .then(bankStr => {
-                bank_sha256 = hexString(bankStr);
-                //console.log("bank_sha256: " + bank_sha256);
+                bankSha256 = hexString(bankStr);
+                //console.log("bankSha256: " + bankSha256);
             })
             .then(() => {
-                crypto.subtle.digest('SHA-256', new TextEncoder().encode(card_key))
+                crypto.subtle.digest('SHA-256', new TextEncoder().encode(cardKey))
                 .then(cardStr => {
-                    card_sha256 = hexString(cardStr);
-                    //console.log("card_sha256: " + card_sha256);
+                    cardSha256 = hexString(cardStr);
+                    //console.log("cardSha256: " + cardSha256);
                 })
             })
             .then(() => {
-                crypto.subtle.digest('SHA-256', new TextEncoder().encode(uni_key))
+                crypto.subtle.digest('SHA-256', new TextEncoder().encode(uniKey))
                 .then(uniStr => {
-                    uni_sha256 = hexString(uniStr);
-                    //console.log("uni_sha256: " + uni_sha256);
+                    uniSha256 = hexString(uniStr);
+                    //console.log("uniSha256: " + uniSha256);
                 })
             })
             .then(() => {
-                //console.log("master_sha256: " + master_sha256);
+                //console.log("masterSha256: " + masterSha256);
 
-                master_db.doc(master_sha256).get().then(function(mkey) {
+                masterDb.doc(masterSha256).get().then(function(mkey) {
 
                     if (mkey.exists) {
 
-                        card_db.doc(uni_sha256).get().then(function(ckey) {
+                        cardDb.doc(uniSha256).get().then(function(ckey) {
 
                             if (ckey.exists) {
 
-                                card_db.doc(uni_sha256).get()
+                                cardDb.doc(uniSha256).get()
                                 .then((doc) => {
                                     let data = doc.data();
                                     cloudNum = data.number;
@@ -796,54 +760,47 @@ class Scratch3Numberbank {
 
         }
 
-        return reportNum_waiter(intervalMs);
+        return reportNumWaiter(intervalMs);
 
     }
 
 
-
     boolAvl (args, util) {
 
-        if (master_sha256 == ''){
-            return;
-        }
+        if (masterSha256 == ''){ return; }
 
-        if (args.BANK == '' || args.CARD == ''){
-            return;
-        }
+        if (args.BANK == '' || args.CARD == ''){ return; }
 
-        if (inoutFlag){
-            return;
-        }
+        if (inoutFlag){ return; }
         inoutFlag = true;
 
         //console.log("boolAvl...");
 
-        bank_key = bank_name = args.BANK;
-        card_key = args.CARD;
+        bankKey = bankName = args.BANK;
+        cardKey = args.CARD;
 
-        uni_key = bank_key.trim().concat(card_key.trim());
-        //console.log("uni_key: " + uni_key);    
+        uniKey = bankKey.trim().concat(cardKey.trim());
+        //console.log("uniKey: " + uniKey);    
 
         if (!crypto || !crypto.subtle) {
             throw Error("crypto.subtle is not supported.");
         }
 
-        if (bank_key != '' && bank_key != undefined){
+        if (bankKey != '' && bankKey != undefined){
 
-            crypto.subtle.digest('SHA-256', new TextEncoder().encode(uni_key))
+            crypto.subtle.digest('SHA-256', new TextEncoder().encode(uniKey))
             .then(uniStr => {
-                uni_sha256 = hexString(uniStr);
-                //console.log("uni_sha256: " + uni_sha256);
+                uniSha256 = hexString(uniStr);
+                //console.log("uniSha256: " + uniSha256);
             })
             .then(() => {
-                //console.log("master_sha256: " + master_sha256);
+                //console.log("masterSha256: " + masterSha256);
                 
-                master_db.doc(master_sha256).get().then(function(mkey) {
+                masterDb.doc(masterSha256).get().then(function(mkey) {
                 
                     if (mkey.exists) {
 
-                        card_db.doc(uni_sha256).get().then(function(ckey) {
+                        cardDb.doc(uniSha256).get().then(function(ckey) {
 
                             if (ckey.exists) {
                                 //console.log("Available!");
@@ -879,31 +836,29 @@ class Scratch3Numberbank {
 
         }
 
-        return available_waiter(intervalMs);
+        return availableWaiter(intervalMs);
 
     }
 
 
     setMaster (args) {
 
-        if (args.KEY == ''){
-            return;
-        }
+        if (args.KEY == ''){ return; }
 
-        master_sha256 = '';
-        master_key = args.KEY;
+        masterSha256 = '';
+        masterKey = args.KEY;
 
         if (!crypto || !crypto.subtle) {
             throw Error("crypto.subtle is not supported.");
         }
 
-        crypto.subtle.digest('SHA-256', new TextEncoder().encode(master_key))
+        crypto.subtle.digest('SHA-256', new TextEncoder().encode(masterKey))
         .then(masterStr => {
-            master_sha256 = hexString(masterStr);
+            masterSha256 = hexString(masterStr);
         })
         .then(() => {
-            //console.log("MasterKey:", master_key);
-            //console.log("master_sha256:", master_sha256);
+            //console.log("MasterKey:", masterKey);
+            //console.log("masterSha256:", masterSha256);
             console.log("MasterKey setted!");
         })
         .catch(function(error) {
