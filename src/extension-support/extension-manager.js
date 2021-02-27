@@ -29,6 +29,9 @@ const builtinExtensions = {
     gdxfor: () => require('../extensions/scratch3_gdx_for')
 };
 
+builtinExtensions['qrcode'] = () => require('../extensions/scratch3_qrcode');
+
+
 /**
  * @typedef {object} ArgumentInfo - Information about an extension block argument
  * @property {ArgumentType} type - the type of value this argument can take
@@ -60,6 +63,7 @@ const builtinExtensions = {
  * @property {Function} resolve - function to call on successful worker startup
  * @property {Function} reject - function to call on failed worker startup
  */
+
 
 class ExtensionManager {
     constructor (runtime) {
