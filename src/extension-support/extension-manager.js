@@ -30,6 +30,7 @@ const builtinExtensions = {
 };
 
 builtinExtensions['qrcode'] = () => require('../extensions/scratch3_qrcode');
+builtinExtensions['sc2scratch'] = () => require('../extensions/scratch3_sc2scratch');
 
 
 /**
