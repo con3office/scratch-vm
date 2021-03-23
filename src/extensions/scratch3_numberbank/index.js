@@ -43,7 +43,7 @@ let intervalMsGet = 1000;
 let intervalMsRep = 1000;
 let intervalMsAvl = 100;
 const projectName ='numberbank-';
-const extVersion = "NumberBank 0.7.6";
+const extVersion = "NumberBank 0.7.7";
 
 /** Firebase Configuration */
 let firebaseConfig = {
