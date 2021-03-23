@@ -170,9 +170,9 @@ class Scratch3Numberbank {
         /** Firebase initilizing only for con3office */
 
 
-        firebase.initializeApp(firebaseConfig);
+        firebase.default.initializeApp(firebaseConfig);
 
-        firestoreDb = firebase.firestore();
+        firestoreDb = firebase.default.firestore();
         masterDb = firestoreDb.collection("master");
         bankDb = firestoreDb.collection("bank");
         cardDb = firestoreDb.collection("card");
